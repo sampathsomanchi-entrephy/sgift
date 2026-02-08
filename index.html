@@ -4,19 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anniversary Games</title>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body class="bg-gradient-to-br from-pink-50 to-white min-h-screen">
-    <div id="app">
-        <home-component v-if="currentView === 'home'" @navigate="navigate"></home-component>
-        <heads-up-component v-if="currentView === 'headsup'" :celebrities="celebrities" @navigate="navigate"></heads-up-component>
-        <wavelength-component v-if="currentView === 'wavelength'" :spectrums="spectrums" @navigate="navigate"></wavelength-component>
-        <scenarios-component v-if="currentView === 'scenarios'" :scenarios="scenarios" @navigate="navigate"></scenarios-component>
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold text-pink-600 text-center mb-8">Anniversary Games 💕</h1>
+        <div class="grid md:grid-cols-4 gap-6 max-w-8xl mx-auto">
+            <a href="headsup.html" class="bg-white rounded-lg shadow-lg p-6 cursor-pointer hover:shadow-xl transition-shadow border-2 border-pink-200 block">
+                <h2 class="text-2xl font-bold text-pink-500 mb-4">🎭 Heads Up!</h2>
+                <p class="text-gray-600">Guess the celebrity! Hide, show, and celebrate when you get it right.</p>
+            </a>
+            <a href="scenarios.html" class="bg-white rounded-lg shadow-lg p-6 cursor-pointer hover:shadow-xl transition-shadow border-2 border-pink-200 block">
+                <h2 class="text-2xl font-bold text-pink-500 mb-4">🎲 Random Scenarios</h2>
+                <p class="text-gray-600">What would you do? Explore fun hypothetical situations together.</p>
+            </a>
+            <a href="wavelength.html" class="bg-white rounded-lg shadow-lg p-6 cursor-pointer hover:shadow-xl transition-shadow border-2 border-pink-200 block">
+                <h2 class="text-2xl font-bold text-pink-500 mb-4">🌊 Wavelength</h2>
+                <p class="text-gray-600">Read minds by guessing where concepts fall on a spectrum between opposites.</p>
+            </a>
+            <a href="charades.html" class="bg-white rounded-lg shadow-lg p-6 cursor-pointer hover:shadow-xl transition-shadow border-2 border-pink-200 block">
+                <h2 class="text-2xl font-bold text-pink-500 mb-4">🎪 Charades</h2>
+                <p class="text-gray-600">Act it out! No words allowed - just gestures and movements.</p>
+            </a>
+        </div>
     </div>
-
-    <script src="js/components.js"></script>
-    <script src="js/app.js"></script>
 </body>
 </html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charades - Anniversary Games</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body class="bg-gradient-to-br from-pink-50 to-white min-h-screen">
+    <div id="app">
+        <div class="container mx-auto px-4 py-8">
+            <a href="index.html" class="mb-4 bg-pink-200 text-pink-700 px-4 py-2 rounded-lg hover:bg-pink-300 inline-block">← Back to Home</a>
+            <div class="max-w-md mx-auto bg-white rounded-lg shadow-lg p-8 text-center">
+                <h2 class="text-3xl font-bold text-pink-600 mb-6">🎪 Charades</h2>
+                
+                <div class="mb-6">
+                    <div class="text-2xl font-bold text-gray-800 mb-4">{{ currentCharade }}</div>
+                    <div class="text-sm text-gray-500">Act it out - no words allowed!</div>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <button @click="gotIt" class="bg-green-500 text-white px-8 py-3 rounded-lg hover:bg-green-600 text-lg font-bold">Got it! 🎉</button>
+                        <button @click="nextCharade" class="bg-pink-300 text-pink-700 px-8 py-3 rounded-lg hover:bg-pink-400 text-lg font-bold">Next →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+        
+        createApp({
+            data() {
+                return {
+                    charades: [],
+                    currentCharadeIndex: 0
+                }
+            },
+            computed: {
+                currentCharade() {
+                    return this.charades[this.currentCharadeIndex] || 'Loading...';
+                }
+            },
+            methods: {
+                async loadCharades() {
+                    try {
+                        const response = await fetch('data/charades.txt');
+                        const text = await response.text();
+                        this.charades = text.split('\n').filter(line => line.trim());
+                    } catch (error) {
+                        console.error('Error loading charades:', error);
+                    }
+                },
+                gotIt() {
+                    confetti({
+                        particleCount: 100,
+                        spread: 70,
+                        origin: { y: 0.6 }
+                    });
+                },
+                nextCharade() {
+                    this.currentCharadeIndex = (this.currentCharadeIndex + 1) % this.charades.length;
+                }
+            },
+            mounted() {
+                this.loadCharades();
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

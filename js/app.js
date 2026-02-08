@@ -6,6 +6,7 @@ createApp({
         HomeComponent,
         HeadsUpComponent,
         WavelengthComponent,
+        CharadesComponent,
         ScenariosComponent
     },
     data() {
@@ -13,7 +14,8 @@ createApp({
             currentView: 'home',
             celebrities: [],
             scenarios: [],
-            spectrums: []
+            spectrums: [],
+            charades: []
         }
     },
     methods: {
@@ -49,11 +51,21 @@ createApp({
             } catch (error) {
                 console.error('Error loading spectrums:', error);
             }
+        },
+        async loadCharades() {
+            try {
+                const response = await fetch('data/charades.txt');
+                const text = await response.text();
+                this.charades = text.split('\n').filter(line => line.trim());
+            } catch (error) {
+                console.error('Error loading charades:', error);
+            }
         }
     },
     mounted() {
         this.loadCelebrities();
         this.loadScenarios();
         this.loadSpectrums();
+        this.loadCharades();
     }
 }).mount('#app');

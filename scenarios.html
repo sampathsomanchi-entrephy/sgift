@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Scenarios - Anniversary Games</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-pink-50 to-white min-h-screen">
+    <div id="app">
+        <div class="container mx-auto px-4 py-8">
+            <a href="index.html" class="mb-4 bg-pink-200 text-pink-700 px-4 py-2 rounded-lg hover:bg-pink-300 inline-block">← Back to Home</a>
+            <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-8 text-center">
+                <h2 class="text-3xl font-bold text-pink-600 mb-6">🎲 Random Scenarios</h2>
+                <div class="mb-6">
+                    <p class="text-lg text-gray-800 leading-relaxed">{{ currentScenario }}</p>
+                </div>
+                <button @click="nextScenario" class="bg-pink-500 text-white px-8 py-3 rounded-lg hover:bg-pink-600 text-lg">Next Scenario →</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+        
+        createApp({
+            data() {
+                return {
+                    scenarios: [],
+                    currentScenarioIndex: 0
+                }
+            },
+            computed: {
+                currentScenario() {
+                    return this.scenarios[this.currentScenarioIndex] || 'Loading...';
+                }
+            },
+            methods: {
+                async loadScenarios() {
+                    try {
+                        const response = await fetch('data/scenarios.txt');
+                        const text = await response.text();
+                        this.scenarios = text.split('\n').filter(line => line.trim());
+                    } catch (error) {
+                        console.error('Error loading scenarios:', error);
+                    }
+                },
+                nextScenario() {
+                    this.currentScenarioIndex = (this.currentScenarioIndex + 1) % this.scenarios.length;
+                }
+            },
+            mounted() {
+                this.loadScenarios();
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

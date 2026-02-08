@@ -3,7 +3,7 @@ const HomeComponent = {
     template: `
         <div class="container mx-auto px-4 py-8">
             <h1 class="text-4xl font-bold text-pink-600 text-center mb-8">Anniversary Games 💕</h1>
-            <div class="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            <div class="grid md:grid-cols-4 gap-6 max-w-8xl mx-auto">
                 <div @click="$emit('navigate', 'headsup')" class="bg-white rounded-lg shadow-lg p-6 cursor-pointer hover:shadow-xl transition-shadow border-2 border-pink-200">
                     <h2 class="text-2xl font-bold text-pink-500 mb-4">🎭 Heads Up!</h2>
                     <p class="text-gray-600">Guess the celebrity! Hide, show, and celebrate when you get it right.</p>
@@ -15,6 +15,10 @@ const HomeComponent = {
                 <div @click="$emit('navigate', 'wavelength')" class="bg-white rounded-lg shadow-lg p-6 cursor-pointer hover:shadow-xl transition-shadow border-2 border-pink-200">
                     <h2 class="text-2xl font-bold text-pink-500 mb-4">🌊 Wavelength</h2>
                     <p class="text-gray-600">Read minds by guessing where concepts fall on a spectrum between opposites.</p>
+                </div>
+                <div @click="$emit('navigate', 'charades')" class="bg-white rounded-lg shadow-lg p-6 cursor-pointer hover:shadow-xl transition-shadow border-2 border-pink-200">
+                    <h2 class="text-2xl font-bold text-pink-500 mb-4">🎪 Charades</h2>
+                    <p class="text-gray-600">Act it out! No words allowed - just gestures and movements.</p>
                 </div>
             </div>
         </div>
@@ -207,6 +211,55 @@ const WavelengthComponent = {
         }
     }
 };
+
+const CharadesComponent = {
+    template: `
+        <div class="container mx-auto px-4 py-8">
+            <button @click="$emit('navigate', 'home')" class="mb-4 bg-pink-200 text-pink-700 px-4 py-2 rounded-lg hover:bg-pink-300">← Back</button>
+            <div class="max-w-md mx-auto bg-white rounded-lg shadow-lg p-8 text-center">
+                <h2 class="text-3xl font-bold text-pink-600 mb-6">🎪 Charades</h2>
+                
+                <div class="mb-6">
+                    <div class="text-2xl font-bold text-gray-800 mb-4">{{ currentCharade }}</div>
+                    <div class="text-sm text-gray-500">Act it out - no words allowed!</div>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <button @click="gotIt" class="bg-green-500 text-white px-8 py-3 rounded-lg hover:bg-green-600 text-lg font-bold">Got it! 🎉</button>
+                        <button @click="nextCharade" class="bg-pink-300 text-pink-700 px-8 py-3 rounded-lg hover:bg-pink-400 text-lg font-bold">Next →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `,
+    props: ['charades'],
+    emits: ['navigate'],
+    data() {
+        return {
+            currentCharadeIndex: 0
+        }
+    },
+    computed: {
+        currentCharade() {
+            return this.charades[this.currentCharadeIndex] || 'Loading...';
+        }
+    },
+    methods: {
+        gotIt() {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        },
+        nextCharade() {
+            this.currentCharadeIndex = (this.currentCharadeIndex + 1) % this.charades.length;
+        }
+    }
+};
+
+const ScenariosComponent = {
     template: `
         <div class="container mx-auto px-4 py-8">
             <button @click="$emit('navigate', 'home')" class="mb-4 bg-pink-200 text-pink-700 px-4 py-2 rounded-lg hover:bg-pink-300">← Back</button>
