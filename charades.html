@@ -16,11 +16,17 @@
                 <h2 class="text-3xl font-bold text-pink-600 mb-6">🎪 Charades</h2>
                 
                 <div class="mb-6">
-                    <div class="text-2xl font-bold text-gray-800 mb-4">{{ currentCharade }}</div>
+                    <div v-if="showCharade" class="text-2xl font-bold text-gray-800 mb-4">{{ currentCharade }}</div>
+                    <div v-else class="text-2xl text-gray-400 mb-4">Activity Hidden</div>
                     <div class="text-sm text-gray-500">Act it out - no words allowed!</div>
                 </div>
                 
                 <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-2">
+                        <button @click="showCharade = false" class="bg-pink-500 text-white px-4 py-3 rounded-lg hover:bg-pink-600 text-sm font-medium">Hide</button>
+                        <button @click="showCharade = true" class="bg-pink-500 text-white px-4 py-3 rounded-lg hover:bg-pink-600 text-sm font-medium">Show</button>
+                    </div>
+                    
                     <div class="grid grid-cols-2 gap-4">
                         <button @click="gotIt" class="bg-green-500 text-white px-8 py-3 rounded-lg hover:bg-green-600 text-lg font-bold">Got it! 🎉</button>
                         <button @click="nextCharade" class="bg-pink-300 text-pink-700 px-8 py-3 rounded-lg hover:bg-pink-400 text-lg font-bold">Next →</button>
@@ -37,7 +43,8 @@
             data() {
                 return {
                     charades: [],
-                    currentCharadeIndex: 0
+                    currentCharadeIndex: 0,
+                    showCharade: false
                 }
             },
             computed: {
@@ -64,6 +71,7 @@
                 },
                 nextCharade() {
                     this.currentCharadeIndex = (this.currentCharadeIndex + 1) % this.charades.length;
+                    this.showCharade = false;
                 }
             },
             mounted() {
