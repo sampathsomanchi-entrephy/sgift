@@ -12,6 +12,7 @@
     <div id="app">
         <home-component v-if="currentView === 'home'" @navigate="navigate"></home-component>
         <heads-up-component v-if="currentView === 'headsup'" :celebrities="celebrities" @navigate="navigate"></heads-up-component>
+        <wavelength-component v-if="currentView === 'wavelength'" :spectrums="spectrums" @navigate="navigate"></wavelength-component>
         <scenarios-component v-if="currentView === 'scenarios'" :scenarios="scenarios" @navigate="navigate"></scenarios-component>
     </div>
 

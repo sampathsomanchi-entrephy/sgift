@@ -5,13 +5,15 @@ createApp({
     components: {
         HomeComponent,
         HeadsUpComponent,
+        WavelengthComponent,
         ScenariosComponent
     },
     data() {
         return {
             currentView: 'home',
             celebrities: [],
-            scenarios: []
+            scenarios: [],
+            spectrums: []
         }
     },
     methods: {
@@ -35,10 +37,23 @@ createApp({
             } catch (error) {
                 console.error('Error loading scenarios:', error);
             }
+        },
+        async loadSpectrums() {
+            try {
+                const response = await fetch('data/spectrums.txt');
+                const text = await response.text();
+                this.spectrums = text.split('\n').filter(line => line.trim()).map(line => {
+                    const [left, right] = line.split(' vs ');
+                    return { left, right };
+                });
+            } catch (error) {
+                console.error('Error loading spectrums:', error);
+            }
         }
     },
     mounted() {
         this.loadCelebrities();
         this.loadScenarios();
+        this.loadSpectrums();
     }
 }).mount('#app');
