@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anniversary Games</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://tailwindcss.com/"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body class="bg-gradient-to-br from-pink-50 to-white min-h-screen">
+    <div id="app">
+        <div v-if="currentView === 'home'" class="container mx-auto px-4 py-8">
+            <h1 class="text-4xl font-bold text-pink-600 text-center mb-8">Anniversary Games 💕</h1>
+            <div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                <div @click="currentView = 'headsup'" class="bg-white rounded-lg shadow-lg p-6 cursor-pointer hover:shadow-xl transition-shadow border-2 border-pink-200">
+                    <h2 class="text-2xl font-bold text-pink-500 mb-4">🎭 Heads Up!</h2>
+                    <p class="text-gray-600">Guess the celebrity! Hide, show, and celebrate when you get it right.</p>
+                </div>
+                <div @click="currentView = 'scenarios'" class="bg-white rounded-lg shadow-lg p-6 cursor-pointer hover:shadow-xl transition-shadow border-2 border-pink-200">
+                    <h2 class="text-2xl font-bold text-pink-500 mb-4">🎲 Random Scenarios</h2>
+                    <p class="text-gray-600">What would you do? Explore fun hypothetical situations together.</p>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="currentView === 'headsup'" class="container mx-auto px-4 py-8">
+            <button @click="currentView = 'home'" class="mb-4 bg-pink-200 text-pink-700 px-4 py-2 rounded-lg hover:bg-pink-300">← Back</button>
+            <div class="max-w-md mx-auto bg-white rounded-lg shadow-lg p-8 text-center">
+                <h2 class="text-3xl font-bold text-pink-600 mb-6">🎭 Heads Up!</h2>
+                <div class="mb-6">
+                    <div v-if="showCelebrity" class="text-2xl font-bold text-gray-800 mb-4">{{ currentCelebrity }}</div>
+                    <div v-else class="text-2xl text-gray-400 mb-4">Celebrity Hidden</div>
+                </div>
+                <div class="space-y-4">
+                    <div class="space-x-4">
+                        <button @click="showCelebrity = false" class="bg-pink-500 text-white px-6 py-2 rounded-lg hover:bg-pink-600">Hide</button>
+                        <button @click="showCelebrity = true" class="bg-pink-500 text-white px-6 py-2 rounded-lg hover:bg-pink-600">Show</button>
+                    </div>
+                    <button @click="gotIt" class="bg-green-500 text-white px-8 py-3 rounded-lg hover:bg-green-600 text-lg font-bold">Got it! 🎉</button>
+                    <button @click="nextCelebrity" class="bg-pink-300 text-pink-700 px-6 py-2 rounded-lg hover:bg-pink-400">Next →</button>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="currentView === 'scenarios'" class="container mx-auto px-4 py-8">
+            <button @click="currentView = 'home'" class="mb-4 bg-pink-200 text-pink-700 px-4 py-2 rounded-lg hover:bg-pink-300">← Back</button>
+            <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-8 text-center">
+                <h2 class="text-3xl font-bold text-pink-600 mb-6">🎲 Random Scenarios</h2>
+                <div class="mb-6">
+                    <p class="text-lg text-gray-800 leading-relaxed">{{ currentScenario }}</p>
+                </div>
+                <button @click="nextScenario" class="bg-pink-500 text-white px-8 py-3 rounded-lg hover:bg-pink-600 text-lg">Next Scenario →</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+        
+        createApp({
+            data() {
+                return {
+                    currentView: 'home',
+                    celebrities: [],
+                    scenarios: [],
+                    currentCelebrityIndex: 0,
+                    currentScenarioIndex: 0,
+                    showCelebrity: false
+                }
+            },
+            computed: {
+                currentCelebrity() {
+                    return this.celebrities[this.currentCelebrityIndex] || 'Loading...';
+                },
+                currentScenario() {
+                    return this.scenarios[this.currentScenarioIndex] || 'Loading...';
+                }
+            },
+            methods: {
+                async loadCelebrities() {
+                    try {
+                        const response = await fetch('celebrities.txt');
+                        const text = await response.text();
+                        this.celebrities = text.split('\n').filter(line => line.trim());
+                    } catch (error) {
+                        console.error('Error loading celebrities:', error);
+                    }
+                },
+                async loadScenarios() {
+                    try {
+                        const response = await fetch('scenarios.txt');
+                        const text = await response.text();
+                        this.scenarios = text.split('\n').filter(line => line.trim());
+                    } catch (error) {
+                        console.error('Error loading scenarios:', error);
+                    }
+                },
+                gotIt() {
+                    confetti({
+                        particleCount: 100,
+                        spread: 70,
+                        origin: { y: 0.6 }
+                    });
+                },
+                nextCelebrity() {
+                    this.currentCelebrityIndex = (this.currentCelebrityIndex + 1) % this.celebrities.length;
+                    this.showCelebrity = false;
+                },
+                nextScenario() {
+                    this.currentScenarioIndex = (this.currentScenarioIndex + 1) % this.scenarios.length;
+                }
+            },
+            mounted() {
+                this.loadCelebrities();
+                this.loadScenarios();
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

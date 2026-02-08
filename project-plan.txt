@@ -1,0 +1,43 @@
+ANNIVERSARY WEBSITE PROJECT PLAN
+
+TECHNICAL STACK:
+- Vue.js 3 (CDN version for simplicity)
+- Tailwind CSS (CDN version)
+- GitHub Pages hosting
+
+WEBSITE FEATURES:
+- Pastel color theme (pink and white)
+- Index page with cards for multiple games
+- Responsive design
+
+GAME 1 - HEADS UP:
+- List of 20 celebrities from celebrities.txt
+- Hide/Show buttons for celebrity name
+- "Got it!" button that triggers confetti
+- "Next" button to move to next celebrity
+
+GAME 2 - RANDOM SCENARIOS:
+- List of 20 scenarios from scenarios.txt
+- Example: "What would you do if you had $500 and were left in New York without a phone"
+- "Next" button to move to next scenario
+
+IMPLEMENTATION STEPS:
+1. Create HTML structure with Vue.js and Tailwind CSS CDN links
+2. Build Vue components:
+   - Home page with pastel pink/white game cards
+   - Heads Up component (hide/show/confetti/next functionality)
+   - Random Scenarios component (next functionality)
+3. Create text files with sample data:
+   - celebrities.txt (20 celebrity names)
+   - scenarios.txt (20 random scenarios)
+4. Implement file reading via fetch API
+5. Add confetti library for "Got it!" button
+6. Configure GitHub Pages
+7. Test deployment
+
+TECHNICAL REQUIREMENTS:
+- Single-page application with Vue components
+- Text files for easy content updates
+- Vue reactivity for game state management
+- Clean component-based architecture
+- Pastel pink/white Tailwind theme
