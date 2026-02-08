@@ -25,7 +25,7 @@ const HeadsUpComponent = {
             <div class="max-w-md mx-auto bg-white rounded-lg shadow-lg p-8 text-center">
                 <h2 class="text-3xl font-bold text-pink-600 mb-6">🎭 Heads Up!</h2>
                 
-                <div v-if="timer > 0" class="mb-4 text-2xl font-bold text-red-500">
+                <div v-if="timer > 0 && timerActive" class="mb-4 text-xl font-bold text-red-500">
                     Time: {{ Math.floor(timer / 60) }}:{{ (timer % 60).toString().padStart(2, '0') }}
                 </div>
                 
@@ -35,13 +35,11 @@ const HeadsUpComponent = {
                 </div>
                 
                 <div class="space-y-4">
-                    <div v-if="!timerActive" class="mb-4">
-                        <button @click="startTimer" class="bg-green-500 text-white px-8 py-3 rounded-lg hover:bg-green-600 text-lg font-bold w-full">Start Timer (1 min)</button>
-                    </div>
-                    
-                    <div class="space-x-4">
-                        <button @click="showCelebrity = false" class="bg-pink-500 text-white px-6 py-2 rounded-lg hover:bg-pink-600">Hide</button>
-                        <button @click="showCelebrity = true" class="bg-pink-500 text-white px-6 py-2 rounded-lg hover:bg-pink-600">Show</button>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button @click="showCelebrity = false" class="bg-pink-500 text-white px-4 py-3 rounded-lg hover:bg-pink-600 text-sm font-medium">Hide</button>
+                        <button @click="showCelebrity = true" class="bg-pink-500 text-white px-4 py-3 rounded-lg hover:bg-pink-600 text-sm font-medium">Show</button>
+                        <button v-if="!timerActive" @click="startTimer" class="bg-green-500 text-white px-4 py-3 rounded-lg hover:bg-green-600 text-sm font-medium">Timer</button>
+                        <div v-else class="bg-red-100 text-red-600 px-4 py-3 rounded-lg text-sm font-medium text-center">{{ Math.floor(timer / 60) }}:{{ (timer % 60).toString().padStart(2, '0') }}</div>
                     </div>
                     
                     <div class="grid grid-cols-2 gap-4">
