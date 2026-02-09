@@ -81,6 +81,8 @@
                         const response = await fetch('data/charades.txt');
                         const text = await response.text();
                         this.charades = text.split('\n').filter(line => line.trim());
+                        // Start with random charade
+                        this.currentCharadeIndex = Math.floor(Math.random() * this.charades.length);
                     } catch (error) {
                         console.error('Error loading charades:', error);
                     }

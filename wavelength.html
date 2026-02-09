@@ -6,6 +6,7 @@
     <title>Wavelength</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body class="bg-gradient-to-br from-pink-50 to-white min-h-screen">
     <div id="app">
@@ -14,15 +15,22 @@
                 <a href="index.html" class="bg-pink-200 text-pink-700 px-4 py-2 rounded-lg hover:bg-pink-300">← Back to Home</a>
                 <button onclick="openRulesModal()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Rules</button>
             </div>
-            <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8">
-                <h2 class="text-3xl font-bold text-pink-600 mb-6 text-center">🌊 Wavelength</h2>
+            <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-4 sm:p-8">
+                <h2 class="text-2xl sm:text-3xl font-bold text-pink-600 mb-6 text-center">🌊 Wavelength</h2>
                 
                 <div class="mb-6 text-center">
                     <div class="text-xl font-bold text-gray-800 mb-4">{{ currentSpectrum.left }} ← → {{ currentSpectrum.right }}</div>
-                    <div class="bg-gradient-to-r from-blue-500 via-yellow-500 to-red-500 h-8 rounded-lg relative mx-auto max-w-md">
-                        <div v-if="showTarget" class="absolute top-0 h-8 bg-green-600 border-2 border-green-800 rounded" 
-                             :style="{ left: targetPosition + '%', width: '15%' }"></div>
-                        <div v-if="guessPosition !== null && gameStarted" class="absolute top-0 h-8 w-1 bg-black" 
+                    <div class="bg-gradient-to-r from-blue-500 via-yellow-500 to-red-500 h-8 sm:h-10 rounded-lg relative mx-auto max-w-xs sm:max-w-md">
+                        <div v-if="(gameStarted && !guessingPhase) || showFinalTarget" class="absolute top-0 h-8 sm:h-10 rounded" 
+                             :style="{ left: targetPosition + '%', width: '15%' }">
+                            <!-- Yellow sides (1 point) -->
+                            <div class="absolute top-0 h-8 sm:h-10 bg-yellow-400 border-2 border-yellow-600 rounded" 
+                                 style="left: 0%; width: 100%;"></div>
+                            <!-- Green center (5 points) -->
+                            <div class="absolute top-0 h-8 sm:h-10 bg-green-600 border-2 border-green-800 rounded" 
+                                 style="left: 33.33%; width: 33.33%;"></div>
+                        </div>
+                        <div v-if="guessPosition !== null && guessingPhase" class="absolute top-0 h-8 sm:h-10 w-1 bg-black" 
                              :style="{ left: guessPosition + '%' }"></div>
                     </div>
                 </div>
@@ -32,16 +40,21 @@
                         <button @click="startRound" class="bg-pink-500 text-white px-8 py-3 rounded-lg hover:bg-pink-600 text-lg font-bold">Start Round</button>
                     </div>
                     
-                    <div v-if="gameStarted && !showTarget" class="space-y-4">
+                    <div v-if="gameStarted && !guessingPhase" class="space-y-4">
+                        <p class="text-gray-700">Psychic: Look at the green target zone and give your clue!</p>
+                        <button @click="startGuessing" class="bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 text-lg font-bold">Start Guessing</button>
+                    </div>
+                    
+                    <div v-if="guessingPhase && !showFinalTarget" class="space-y-4">
+                        <p class="text-gray-700">Team: Move the dial based on the Psychic's clue</p>
                         <div class="mb-4">
-                            <label class="block text-gray-700 mb-2">Move the dial to make your guess:</label>
                             <input type="range" min="0" max="85" v-model="guessPosition" 
                                    class="w-full max-w-md mx-auto block">
                         </div>
                         <button @click="lockInGuess" class="bg-green-500 text-white px-8 py-3 rounded-lg hover:bg-green-600 text-lg font-bold">Lock In Guess</button>
                     </div>
                     
-                    <div v-if="showTarget" class="space-y-4">
+                    <div v-if="showFinalTarget" class="space-y-4">
                         <div class="text-lg font-bold" :class="scoreClass">{{ scoreText }}</div>
                         <button @click="nextRound" class="bg-pink-500 text-white px-8 py-3 rounded-lg hover:bg-pink-600 text-lg">Next Round →</button>
                     </div>
@@ -65,12 +78,12 @@
             <div class="text-left space-y-4">
                 <p class="text-lg text-gray-700"><strong>How to Play:</strong></p>
                 <ul class="list-disc list-inside text-gray-700 space-y-2">
-                    <li>One player is the <strong>Psychic</strong> - they can see the target zone (green area)</li>
+                    <li>One player is the <strong>Psychic</strong> - they can see the target zone</li>
                     <li>The Psychic gives a clue for where a concept falls on the spectrum</li>
                     <li>Example: For "Hot vs Cold" with target on the far hot side, clue might be "The Sun"</li>
                     <li>Team discusses and moves the dial to guess the target location</li>
                     <li>Press <strong>Lock In Guess</strong> to reveal how close you were</li>
-                    <li><strong>Scoring:</strong> Perfect (4pts), Great (3pts), Good (2pts), Close (1pt), Miss (0pts)</li>
+                    <li><strong>Scoring:</strong> Green center (5pts), Yellow sides (1pt), Miss (0pts)</li>
                 </ul>
                 <p class="text-sm text-gray-600 mt-4"><em>Goal: Get as close to the center of the green target zone as possible!</em></p>
             </div>
@@ -88,7 +101,8 @@
                     targetPosition: 50,
                     guessPosition: null,
                     gameStarted: false,
-                    showTarget: false
+                    guessingPhase: false,
+                    showFinalTarget: false
                 }
             },
             computed: {
@@ -97,18 +111,36 @@
                 },
                 scoreText() {
                     if (this.guessPosition === null) return '';
-                    const distance = Math.abs(this.guessPosition - (this.targetPosition + 7.5));
-                    if (distance <= 7.5) return '🎯 Perfect! 4 Points';
-                    if (distance <= 15) return '🎉 Great! 3 Points';
-                    if (distance <= 25) return '👍 Good! 2 Points';
-                    if (distance <= 35) return '👌 Close! 1 Point';
+                    const targetCenter = this.targetPosition + 7.5;
+                    const targetStart = this.targetPosition;
+                    const targetEnd = this.targetPosition + 15;
+                    const greenStart = this.targetPosition + 5;
+                    const greenEnd = this.targetPosition + 10;
+                    
+                    // Check if guess is within target zone
+                    if (this.guessPosition >= targetStart && this.guessPosition <= targetEnd) {
+                        // Check if in green center (5 points)
+                        if (this.guessPosition >= greenStart && this.guessPosition <= greenEnd) {
+                            return '🎯 Perfect! 5 Points';
+                        }
+                        // In yellow sides (1 point)
+                        return '👍 Good! 1 Point';
+                    }
                     return '😅 Miss! 0 Points';
                 },
                 scoreClass() {
                     if (this.guessPosition === null) return '';
-                    const distance = Math.abs(this.guessPosition - (this.targetPosition + 7.5));
-                    if (distance <= 15) return 'text-green-600';
-                    if (distance <= 35) return 'text-yellow-600';
+                    const targetStart = this.targetPosition;
+                    const targetEnd = this.targetPosition + 15;
+                    const greenStart = this.targetPosition + 5;
+                    const greenEnd = this.targetPosition + 10;
+                    
+                    if (this.guessPosition >= targetStart && this.guessPosition <= targetEnd) {
+                        if (this.guessPosition >= greenStart && this.guessPosition <= greenEnd) {
+                            return 'text-green-600';
+                        }
+                        return 'text-yellow-600';
+                    }
                     return 'text-red-600';
                 }
             },
@@ -121,6 +153,8 @@
                             const [left, right] = line.split(' vs ');
                             return { left, right };
                         });
+                        // Start with random spectrum
+                        this.currentSpectrumIndex = Math.floor(Math.random() * this.spectrums.length);
                     } catch (error) {
                         console.error('Error loading spectrums:', error);
                     }
@@ -129,15 +163,30 @@
                     this.targetPosition = Math.random() * 85;
                     this.guessPosition = 42.5;
                     this.gameStarted = true;
-                    this.showTarget = false;
+                    this.guessingPhase = false;
+                    this.showFinalTarget = false;
+                },
+                startGuessing() {
+                    this.guessingPhase = true;
                 },
                 lockInGuess() {
-                    this.showTarget = true;
+                    this.showFinalTarget = true;
+                    // Check if guess is within green center for confetti
+                    const greenStart = this.targetPosition + 5;
+                    const greenEnd = this.targetPosition + 10;
+                    if (this.guessPosition >= greenStart && this.guessPosition <= greenEnd) {
+                        confetti({
+                            particleCount: 150,
+                            spread: 70,
+                            origin: { y: 0.6 }
+                        });
+                    }
                 },
                 nextRound() {
                     this.currentSpectrumIndex = (this.currentSpectrumIndex + 1) % this.spectrums.length;
                     this.gameStarted = false;
-                    this.showTarget = false;
+                    this.guessingPhase = false;
+                    this.showFinalTarget = false;
                     this.guessPosition = null;
                 }
             },

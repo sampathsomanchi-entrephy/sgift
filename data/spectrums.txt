@@ -1,20 +1,30 @@
-Hot vs Cold
-Fast vs Slow
-Big vs Small
-Loud vs Quiet
-Rough vs Smooth
-Heavy vs Light
-Bright vs Dark
-Sweet vs Sour
-Hard vs Soft
-New vs Old
-Rich vs Poor
-Happy vs Sad
-Smart vs Dumb
-Beautiful vs Ugly
-Strong vs Weak
-Tall vs Short
-Thick vs Thin
-Wide vs Narrow
-Deep vs Shallow
-Clean vs Dirty
+Bland vs Spicy
+Sweet vs Savory
+Healthy vs Indulgent
+Indoor Activity vs Outdoor Activity
+Solo Activity vs Group Activity
+Relaxing vs Energetic
+Cheap Date vs Expensive Date
+Good Double Date Idea with Grisha and Stan vs Bad Double Date Idea with Grisha and Stan
+Perfect Taylor Swift Concert Outfit vs Terrible Taylor Swift Concert Outfit
+Iconic Brooklyn Nine-Nine Moment vs Forgettable Brooklyn Nine-Nine Moment
+Iconic Friends Moment vs Forgettable Friends Moment
+Iconic New Girl Moment vs Forgettable New Girl Moment
+Something Jake Peralta Would Do vs Something Amy Santiago Would Do
+Something Jess Would Do vs Something Nick Would Do
+Something Rachel Would Do vs Something Monica Would Do
+Perfect First Date Activity vs Terrible First Date Activity
+Something Sumyukta Would Love vs Something Sumyukta Would Hate
+Perfect Rainy Day Activity vs Boring Rainy Day Activity
+Great Dessert vs Terrible Dessert
+Amazing Thai Food vs Terrible Thai Food
+Perfect Picnic Food vs Terrible Picnic Food
+Outfit for Meeting Parents vs Outfit for Clubbing
+Something to Do with Steph vs Something to Do Alone
+Perfect Anniversary Gift vs Terrible Anniversary Gift
+Great Crocheting Project vs Impossible Crocheting Project
+Easy Baking Recipe vs Difficult Baking Recipe
+Perfect Rom-Com vs Terrible Rom-Com
+Great Tennis Shot vs Terrible Tennis Shot
+Amazing Concert Experience vs Terrible Concert Experience
+Perfect Long Drive Music vs Terrible Long Drive Music

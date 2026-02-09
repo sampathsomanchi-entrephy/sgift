@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What Do You Meme</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body class="bg-gradient-to-br from-pink-50 to-white min-h-screen">
+    <div id="app">
+        <div class="container mx-auto px-4 py-8">
+            <div class="flex justify-between items-center mb-4">
+                <a href="index.html" class="bg-pink-200 text-pink-700 px-4 py-2 rounded-lg hover:bg-pink-300">← Back to Home</a>
+                <button onclick="openRulesModal()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Rules</button>
+            </div>
+            <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-4 sm:p-8">
+                <h2 class="text-2xl sm:text-3xl font-bold text-pink-600 mb-6 text-center">😂 What Do You Meme</h2>
+                
+                <div v-if="!gameStarted" class="text-center space-y-4">
+                    <p class="text-gray-700">Create hilarious memes with personalized situations!</p>
+                    <button @click="startGame" class="bg-pink-500 text-white px-8 py-3 rounded-lg hover:bg-pink-600 text-lg font-bold">Start Game</button>
+                </div>
+
+                <div v-if="gameStarted" class="space-y-6">
+                    <!-- Meme Situation -->
+                    <div class="bg-gray-100 p-6 rounded-lg text-center">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Meme This Situation:</h3>
+                        <div class="text-xl font-bold text-pink-600 leading-relaxed">
+                            {{ currentSituation }}
+                        </div>
+                    </div>
+
+                    <!-- Caption Options -->
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-bold text-gray-800 text-center">Choose Your Caption:</h3>
+                        <div class="grid grid-cols-1 gap-3">
+                            <button v-for="(caption, index) in captionOptions" :key="index"
+                                    @click="selectCaption(index)"
+                                    :class="selectedCaption === index ? 'bg-pink-500 text-white' : 'bg-white border-2 border-pink-200 text-gray-800 hover:bg-pink-50'"
+                                    class="p-4 rounded-lg text-left font-medium transition-colors">
+                                {{ caption }}
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="text-center space-y-4">
+                        <button v-if="selectedCaption !== null" @click="revealMeme" 
+                                class="bg-green-500 text-white px-8 py-3 rounded-lg hover:bg-green-600 text-lg font-bold">
+                            Create Meme! 🎨
+                        </button>
+                        
+                        <div v-if="showResult" class="space-y-4">
+                            <div class="bg-pink-100 p-6 rounded-lg">
+                                <h3 class="text-xl font-bold text-pink-700 mb-4">Your Meme:</h3>
+                                <div class="bg-white p-4 rounded border-2 border-pink-300">
+                                    <div class="text-sm text-gray-600 mb-2">{{ currentSituation }}</div>
+                                    <div class="text-lg font-bold text-gray-800">{{ captionOptions[selectedCaption] }}</div>
+                                </div>
+                            </div>
+                            <button @click="nextMeme" class="bg-pink-500 text-white px-8 py-3 rounded-lg hover:bg-pink-600 text-lg font-bold">
+                                Next Meme →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rules Modal -->
+    <div id="rulesModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-4 sm:p-8 max-w-2xl mx-4 relative">
+            <button onclick="closeRulesModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            <h2 class="text-2xl sm:text-3xl font-bold text-pink-600 mb-6 text-center">😂 What Do You Meme Rules</h2>
+            <div class="text-left space-y-4">
+                <p class="text-lg text-gray-700"><strong>How to Play:</strong></p>
+                <ul class="list-disc list-inside text-gray-700 space-y-2">
+                    <li>Read the situation presented</li>
+                    <li>Choose the funniest caption from the options</li>
+                    <li>Click "Create Meme!" to see your creation</li>
+                    <li>Share and laugh at the personalized meme</li>
+                    <li>Click "Next Meme" for a new situation</li>
+                    <li>Situations are based on your interests and relationships!</li>
+                </ul>
+                <p class="text-sm text-gray-600 mt-4"><em>Perfect for creating inside jokes and funny moments!</em></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    situations: [],
+                    captions: [],
+                    currentSituationIndex: 0,
+                    captionOptions: [],
+                    selectedCaption: null,
+                    gameStarted: false,
+                    showResult: false
+                }
+            },
+            computed: {
+                currentSituation() {
+                    return this.situations[this.currentSituationIndex] || '';
+                }
+            },
+            methods: {
+                async loadContent() {
+                    // Meme situations based on interests
+                    this.situations = [
+                        "When Sampath suggests watching The Office again but you want to watch Friends",
+                        "When you're crocheting and someone asks if you can make them a sweater by tomorrow",
+                        "When Steph texts you at 2am with relationship drama",
+                        "When you're at a Thai restaurant and they ask 'how spicy' on a scale of 1-10",
+                        "When Taylor Swift drops a surprise album and you haven't finished processing the last one",
+                        "When you're playing tennis and the ball hits you instead of your racket",
+                        "When someone says they don't like gulab jamun",
+                        "When you're baking and realize you forgot a key ingredient halfway through",
+                        "When Grisha and Stan invite you on a double date to a place you've never heard of",
+                        "When you're watching Brooklyn Nine-Nine and someone says 'this isn't realistic'",
+                        "When you're doing pilates and the instructor says 'just one more rep'",
+                        "When someone asks if you can teach them to crochet in 5 minutes",
+                        "When you're at a picnic and it starts raining",
+                        "When Ed Sheeran comes on the radio for the 10th time today",
+                        "When you're gardening and find a bug",
+                        "When someone suggests pineapple on pizza",
+                        "When you're reading a romance book and someone spoils the ending",
+                        "When you're making clay pottery and it collapses",
+                        "When someone says they've never seen Friends",
+                        "When you're at a concert and can't see over the tall person in front of you"
+                    ];
+
+                    // Generic funny captions
+                    this.captions = [
+                        "This is fine.",
+                        "I don't think so, buddy.",
+                        "Excuse me, what?",
+                        "Not today, Satan.",
+                        "I'm about to end this whole career.",
+                        "Why are you like this?",
+                        "I can't even...",
+                        "The audacity!",
+                        "Ma'am, this is a Wendy's.",
+                        "I'm not mad, just disappointed.",
+                        "That's a no from me, dawg.",
+                        "You had one job.",
+                        "I'm too old for this.",
+                        "What in the world?",
+                        "Absolutely not.",
+                        "I'm calling the police.",
+                        "This ain't it, chief.",
+                        "I'm done.",
+                        "The disrespect!",
+                        "I'm shook.",
+                        "That's sus.",
+                        "Big yikes.",
+                        "I'm deceased.",
+                        "This is chaos.",
+                        "I'm living for this drama.",
+                        "That's a whole mood.",
+                        "I'm weak.",
+                        "This is sending me.",
+                        "I'm crying.",
+                        "That's actually iconic."
+                    ];
+
+                    // Start with random situation
+                    this.currentSituationIndex = Math.floor(Math.random() * this.situations.length);
+                },
+                startGame() {
+                    this.gameStarted = true;
+                    this.generateCaptionOptions();
+                },
+                generateCaptionOptions() {
+                    // Pick 4 random captions
+                    const shuffled = [...this.captions].sort(() => Math.random() - 0.5);
+                    this.captionOptions = shuffled.slice(0, 4);
+                    this.selectedCaption = null;
+                    this.showResult = false;
+                },
+                selectCaption(index) {
+                    this.selectedCaption = index;
+                },
+                revealMeme() {
+                    this.showResult = true;
+                    confetti({
+                        particleCount: 100,
+                        spread: 70,
+                        origin: { y: 0.6 }
+                    });
+                },
+                nextMeme() {
+                    this.currentSituationIndex = (this.currentSituationIndex + 1) % this.situations.length;
+                    this.generateCaptionOptions();
+                }
+            },
+            mounted() {
+                this.loadContent();
+            }
+        }).mount('#app');
+
+        function openRulesModal() {
+            document.getElementById('rulesModal').classList.remove('hidden');
+            document.getElementById('rulesModal').classList.add('flex');
+        }
+
+        function closeRulesModal() {
+            document.getElementById('rulesModal').classList.add('hidden');
+            document.getElementById('rulesModal').classList.remove('flex');
+        }
+
+        document.getElementById('rulesModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeRulesModal();
+            }
+        });
+    </script>
+</body>
+</html>
