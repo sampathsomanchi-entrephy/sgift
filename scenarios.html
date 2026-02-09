@@ -10,13 +10,36 @@
 <body class="bg-gradient-to-br from-pink-50 to-white min-h-screen">
     <div id="app">
         <div class="container mx-auto px-4 py-8">
-            <a href="index.html" class="mb-4 bg-pink-200 text-pink-700 px-4 py-2 rounded-lg hover:bg-pink-300 inline-block">← Back to Home</a>
+            <div class="flex justify-between items-center mb-4">
+                <a href="index.html" class="bg-pink-200 text-pink-700 px-4 py-2 rounded-lg hover:bg-pink-300">← Back to Home</a>
+                <button onclick="openRulesModal()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Rules</button>
+            </div>
             <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-8 text-center">
                 <h2 class="text-3xl font-bold text-pink-600 mb-6">🎲 Random Scenarios</h2>
                 <div class="mb-6">
                     <p class="text-lg text-gray-800 leading-relaxed">{{ currentScenario }}</p>
                 </div>
                 <button @click="nextScenario" class="bg-pink-500 text-white px-8 py-3 rounded-lg hover:bg-pink-600 text-lg">Next Scenario →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rules Modal -->
+    <div id="rulesModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-2xl mx-4 relative">
+            <button onclick="closeRulesModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            <h2 class="text-3xl font-bold text-pink-600 mb-6 text-center">🎲 Random Scenarios Rules</h2>
+            <div class="text-left space-y-4">
+                <p class="text-lg text-gray-700"><strong>How to Play:</strong></p>
+                <ul class="list-disc list-inside text-gray-700 space-y-2">
+                    <li>Read the scenario presented on screen</li>
+                    <li>Discuss what you would do in that situation</li>
+                    <li>Share your thoughts, reasoning, and different perspectives</li>
+                    <li>There are no right or wrong answers - it's all about discussion!</li>
+                    <li>Press <strong>Next Scenario</strong> when ready to move on</li>
+                    <li>Great for getting to know each other better and sparking conversations</li>
+                </ul>
+                <p class="text-sm text-gray-600 mt-4"><em>Perfect for couples, friends, or family game nights to learn more about each other!</em></p>
             </div>
         </div>
     </div>
@@ -54,6 +77,22 @@
                 this.loadScenarios();
             }
         }).mount('#app');
+
+        function openRulesModal() {
+            document.getElementById('rulesModal').classList.remove('hidden');
+            document.getElementById('rulesModal').classList.add('flex');
+        }
+
+        function closeRulesModal() {
+            document.getElementById('rulesModal').classList.add('hidden');
+            document.getElementById('rulesModal').classList.remove('flex');
+        }
+
+        document.getElementById('rulesModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeRulesModal();
+            }
+        });
     </script>
 </body>
 </html>

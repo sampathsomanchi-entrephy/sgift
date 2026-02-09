@@ -11,7 +11,10 @@
 <body class="bg-gradient-to-br from-pink-50 to-white min-h-screen">
     <div id="app">
         <div class="container mx-auto px-4 py-8">
-            <a href="index.html" class="mb-4 bg-pink-200 text-pink-700 px-4 py-2 rounded-lg hover:bg-pink-300 inline-block">← Back to Home</a>
+            <div class="flex justify-between items-center mb-4">
+                <a href="index.html" class="bg-pink-200 text-pink-700 px-4 py-2 rounded-lg hover:bg-pink-300">← Back to Home</a>
+                <button onclick="openRulesModal()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Rules</button>
+            </div>
             <div class="max-w-md mx-auto bg-white rounded-lg shadow-lg p-8 text-center">
                 <h2 class="text-3xl font-bold text-pink-600 mb-6">🎪 Charades</h2>
                 
@@ -32,6 +35,26 @@
                         <button @click="nextCharade" class="bg-pink-300 text-pink-700 px-8 py-3 rounded-lg hover:bg-pink-400 text-lg font-bold">Next →</button>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rules Modal -->
+    <div id="rulesModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-2xl mx-4 relative">
+            <button onclick="closeRulesModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            <h2 class="text-3xl font-bold text-pink-600 mb-6 text-center">🎪 Charades Rules</h2>
+            <div class="text-left space-y-4">
+                <p class="text-lg text-gray-700"><strong>How to Play:</strong></p>
+                <ul class="list-disc list-inside text-gray-700 space-y-2">
+                    <li>One player acts out the activity shown on screen</li>
+                    <li>Use <strong>Hide/Show</strong> buttons to control when the activity appears</li>
+                    <li><strong>No talking allowed!</strong> Only gestures, movements, and expressions</li>
+                    <li>Other players guess what's being acted out</li>
+                    <li>When someone guesses correctly, hit <strong>Got it!</strong> for celebration</li>
+                    <li>Press <strong>Next</strong> to move to a new activity</li>
+                </ul>
+                <p class="text-sm text-gray-600 mt-4"><em>Tip: Start with the activity hidden so the actor can't see it, then show it to everyone else!</em></p>
             </div>
         </div>
     </div>
@@ -78,6 +101,22 @@
                 this.loadCharades();
             }
         }).mount('#app');
+
+        function openRulesModal() {
+            document.getElementById('rulesModal').classList.remove('hidden');
+            document.getElementById('rulesModal').classList.add('flex');
+        }
+
+        function closeRulesModal() {
+            document.getElementById('rulesModal').classList.add('hidden');
+            document.getElementById('rulesModal').classList.remove('flex');
+        }
+
+        document.getElementById('rulesModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeRulesModal();
+            }
+        });
     </script>
 </body>
 </html>
