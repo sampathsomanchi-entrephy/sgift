@@ -22,7 +22,7 @@
                     <div class="bg-gradient-to-r from-blue-500 via-yellow-500 to-red-500 h-8 rounded-lg relative mx-auto max-w-md">
                         <div v-if="showTarget" class="absolute top-0 h-8 bg-green-600 border-2 border-green-800 rounded" 
                              :style="{ left: targetPosition + '%', width: '15%' }"></div>
-                        <div v-if="guessPosition !== null" class="absolute top-0 h-8 w-1 bg-black" 
+                        <div v-if="guessPosition !== null && gameStarted" class="absolute top-0 h-8 w-1 bg-black" 
                              :style="{ left: guessPosition + '%' }"></div>
                     </div>
                 </div>
