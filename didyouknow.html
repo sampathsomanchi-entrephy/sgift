@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Did You Know? - Fun Facts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-pink-50 to-white min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <div class="flex justify-between items-center mb-4">
+            <a href="index.html" class="bg-pink-200 text-pink-700 px-4 py-2 rounded-lg hover:bg-pink-300">← Back to Home</a>
+            <button onclick="openRulesModal()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Rules</button>
+        </div>
+        <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-8 text-center">
+            <h2 class="text-3xl font-bold text-pink-600 mb-6">🧠 Did You Know?</h2>
+            <div id="factCard" class="mb-6 min-h-[200px] flex items-center justify-center">
+                <div class="text-center">
+                    <div class="text-6xl mb-4">🎲</div>
+                    <p class="text-gray-500 text-lg">Click a category or "Random Fact" to discover something amazing!</p>
+                </div>
+            </div>
+            <div class="mb-4">
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
+                    <button onclick="getFactByCategory('Animals')" class="bg-green-500 text-white px-3 py-2 rounded text-sm hover:bg-green-600">🐱 Animals</button>
+                    <button onclick="getFactByCategory('Food')" class="bg-orange-500 text-white px-3 py-2 rounded text-sm hover:bg-orange-600">🍔 Food</button>
+                    <button onclick="getFactByCategory('History')" class="bg-purple-500 text-white px-3 py-2 rounded text-sm hover:bg-purple-600">🏛️ History</button>
+                    <button onclick="getFactByCategory('India')" class="bg-indigo-500 text-white px-3 py-2 rounded text-sm hover:bg-indigo-600">🇮🇳 India</button>
+                    <button onclick="getFactByCategory('Science')" class="bg-blue-500 text-white px-3 py-2 rounded text-sm hover:bg-blue-600">🧠 Science</button>
+                </div>
+            </div>
+            <button onclick="getRandomFact()" class="bg-pink-500 text-white px-8 py-3 rounded-lg hover:bg-pink-600 text-lg">Random Fact</button>
+        </div>
+    </div>
+
+    <!-- Rules Modal -->
+    <div id="rulesModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-2xl mx-4 relative">
+            <button onclick="closeRulesModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            <h2 class="text-2xl font-bold text-pink-600 mb-4">How to Play</h2>
+            <div class="text-left space-y-3">
+                <p>• Click "Get Random Fact" to discover fascinating trivia</p>
+                <p>• Facts cover science, culture, history, and random curiosities</p>
+                <p>• Perfect for learning something new together!</p>
+                <p>• Share your favorite facts and discuss what surprises you</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const facts = [
+            // Food Facts
+            { category: "🍓 Food", fact: "Strawberries are the only fruit with seeds on the outside!" },
+            { category: "🥭 Food", fact: "Mangoes belong to the same plant family as cashews and poison ivy." },
+            { category: "🍉 Food", fact: "Watermelons are about 92% water and originated in Africa." },
+            { category: "🍫 Food", fact: "The Aztecs drank chocolate as a bitter beverage and considered it sacred." },
+            { category: "🌮 Food", fact: "The word 'taco' comes from Mexican Spanish, meaning a light meal or snack." },
+            { category: "🥑 Food", fact: "Avocados are technically berries and contain more potassium than bananas." },
+            { category: "🍝 Food", fact: "Naan bread is traditionally baked by sticking it to the walls of a tandoor oven." },
+
+            // TV Show Facts
+            { category: "📺 Brooklyn Nine-Nine", fact: "The show was created by Michael Schur and Dan Goor, who also worked on The Office and Parks and Recreation." },
+            { category: "📺 New Girl", fact: "The show ran for 7 seasons from 2011 to 2018 and was known for its quirky humor." },
+            { category: "📺 Friends", fact: "Friends aired for 10 seasons from 1994 to 2004 and remains one of the most popular sitcoms ever." },
+            { category: "📺 The Office", fact: "The US version of The Office was adapted from the British series created by Ricky Gervais." },
+            { category: "📺 Bridgerton", fact: "Bridgerton is based on Julia Quinn's romance novel series and became Netflix's most-watched series." },
+            { category: "📺 Modern Family", fact: "Modern Family won 5 consecutive Emmy Awards for Outstanding Comedy Series from 2010-2014." },
+            { category: "📺 Schitt's Creek", fact: "Schitt's Creek was created by father-son duo Eugene and Dan Levy." },
+            { category: "📺 How I Met Your Mother", fact: "The show's premise involves Ted telling his children the story of how he met their mother." },
+
+            // People & Relationships
+            { category: "👥 Friendship", fact: "Research shows that having close friendships can increase lifespan and improve mental health." },
+            { category: "💕 Love", fact: "The brain releases dopamine, norepinephrine, and serotonin when you're in love." },
+            { category: "👨‍👩‍👧‍👦 Family", fact: "Regular family meals are associated with better academic performance in children." },
+            { category: "🎭 Names", fact: "Names can influence how people perceive personality traits and first impressions." },
+
+            // Activities & Hobbies
+            { category: "🎨 Art", fact: "Creating art activates the brain's reward center and can reduce stress hormones." },
+            { category: "🎵 Music", fact: "Music can trigger the release of dopamine, the same neurotransmitter involved in addiction and pleasure." },
+            { category: "📚 Reading", fact: "Reading regularly can improve vocabulary, concentration, and critical thinking skills." },
+            { category: "🎮 Games", fact: "Board games and social games can improve problem-solving skills and social bonding." },
+
+            // Science & Cancer Research Facts
+            { category: "🧬 Oncology", fact: "CAR-T cell therapy genetically modifies a patient's T-cells to express chimeric antigen receptors that target CD19 proteins on B-cell lymphomas." },
+            { category: "🧬 Oncology", fact: "Tumor suppressor gene p53, called the 'guardian of the genome,' is mutated in over 50% of human cancers and normally triggers apoptosis in damaged cells." },
+            { category: "🧬 Oncology", fact: "Liquid biopsies can detect circulating tumor DNA (ctDNA) fragments in blood plasma, allowing non-invasive monitoring of tumor burden and treatment response." },
+            { category: "🧬 Oncology", fact: "The Warburg effect describes how cancer cells preferentially use glycolysis for energy production even in oxygen-rich environments, unlike normal cells." },
+            { category: "🧬 Oncology", fact: "Checkpoint inhibitors like pembrolizumab block PD-1/PD-L1 interactions, preventing cancer cells from evading immune system T-cell responses." },
+            { category: "🧬 Oncology", fact: "Microsatellite instability-high (MSI-H) tumors have defective DNA mismatch repair and respond exceptionally well to immune checkpoint blockade therapy." },
+
+            // Fashion & Culture Facts
+            { category: "🧵 Haute Couture", fact: "Maison Lesage, founded in 1858, hand-embroiders couture pieces using techniques like 'luneville' hook embroidery and can take 600+ hours per garment." },
+            { category: "🧵 Haute Couture", fact: "Chantilly lace gets its distinctive floral motifs from bobbin lace techniques developed in 17th century France, requiring 40+ bobbins per lacemaker." },
+            { category: "🧵 Haute Couture", fact: "Japanese sashiko stitching originated as a mending technique using indigo-dyed thread in running stitches to reinforce worn textiles during the Edo period." },
+            { category: "🌍 Ethnography", fact: "Balinese prada textiles use real gold leaf applied with perekat (tree sap adhesive) in intricate patterns reserved for temple ceremonies and royal garments." },
+            { category: "🌍 Ethnography", fact: "Moroccan zellij tilework requires 10+ years of apprenticeship to master the 'maâlem' technique of hand-cutting geometric terra cotta pieces called 'fakhkhar.'" },
+            { category: "🌍 Ethnography", fact: "Peruvian backstrap loom weaving uses 'complementary warp' techniques where weavers manipulate individual threads to create complex tocapu geometric patterns." },
+            { category: "🌍 Ethnography", fact: "Ethiopian habesha kemis dresses feature 'tibeb' borders with specific stitch counts (traditionally 7, 9, or 12) that indicate regional origins and social status." },
+            { category: "🌍 Ethnography", fact: "West African adinkra symbols are hand-stamped using carved calabash stamps dipped in boiled bark dye, with over 400 documented symbolic meanings." },
+            { category: "🌍 Ethnography", fact: "Traditional Korean hanbok uses 'git' collar construction with precise 2.5cm measurements and 'dongjeong' white collar strips indicating Confucian virtue ideals." },
+
+            // Random Trivia Facts
+            { category: "💵 Currency", fact: "The numbers '172' can be found on the back of the U.S. $5 dollar bill in the bushes at the base of the Lincoln Memorial." },
+            { category: "🎤 Presidents", fact: "President Kennedy was the fastest random speaker in the world with upwards of 350 words per minute." },
+            { category: "🚶 Human Body", fact: "In the average lifetime, a person will walk the equivalent of 5 times around the equator." },
+            { category: "😨 Phobias", fact: "Odontophobia is the fear of teeth." },
+            { category: "🍅 Food History", fact: "The 57 on Heinz ketchup bottles represents the number of varieties of pickles the company once had." },
+            { category: "📞 Technology", fact: "Early telephone operators would say 'Well, are you there?' until 1895 when 'number please?' was suggested." },
+            { category: "🧱 Architecture", fact: "The surface area of an average-sized brick is 79 cm squared." },
+            { category: "🐱 Animals", fact: "Cats sleep 16 to 18 hours per day and can hear ultrasound." },
+            { category: "📚 Literature", fact: "Shakespeare was 46 when the King James Bible was written. In Psalms 46, the 46th word from start is 'shake' and 46th from end is 'spear'." },
+            { category: "🎵 Language", fact: "Karaoke means 'empty orchestra' in Japanese." },
+            { category: "🛣️ Infrastructure", fact: "The Eisenhower interstate system requires one mile in every five to be straight for use as emergency airstrips." },
+            { category: "🏛️ Ancient History", fact: "The first known contraceptive was crocodile dung, used by Egyptians in 2000 B.C." },
+            { category: "📍 Geography", fact: "Rhode Island's official name is 'Rhode Island and Providence Plantations' - smallest state with the longest name." },
+            { category: "💳 Economics", fact: "There are two credit cards for every person in the United States." },
+            { category: "📖 Authors", fact: "Isaac Asimov is the only author to have a book in every Dewey-decimal category." },
+            { category: "🏗️ Buildings", fact: "It would take 11 Empire State Buildings stacked to measure the Gulf of Mexico at its deepest point." },
+            { category: "🏆 Awards", fact: "Charles Lindbergh was the first person selected as Time Magazine Man of the Year in 1927." },
+            { category: "🐄 Auctions", fact: "The most money ever paid for a cow in an auction was $1.3 million." },
+            { category: "✍️ Writing", fact: "It took Leo Tolstoy six years to write 'War & Peace'." },
+            { category: "🧠 Evolution", fact: "The Neanderthal's brain was bigger than modern humans'." },
+            { category: "💵 Currency", fact: "On the new hundred dollar bill, the time on Independence Hall's clock tower is 4:10." },
+            { category: "🃏 Cards", fact: "Card suits represent medieval economy pillars: hearts=Church, spades=military, clubs=agriculture, diamonds=merchants." },
+            { category: "🦁 NYC", fact: "The stone lions in front of NY Public Library are named Patience and Fortitude by mayor LaGuardia." },
+            { category: "📚 Engineering", fact: "Indiana University's Main Library sinks over an inch yearly - engineers forgot to account for book weight." },
+            { category: "🎬 Movies", fact: "E.T.'s walking sound was made by someone squishing hands in jelly." },
+            { category: "🥞 Biology", fact: "The pancreas produces insulin." },
+            { category: "🦞 Marine Life", fact: "1 in 5,000 North Atlantic lobsters are born bright blue." },
+            { category: "👁️ Human Body", fact: "There are 10 human body parts with only 3 letters: eye, hip, arm, leg, ear, toe, jaw, rib, lip, gum." },
+            { category: "🦨 Animals", fact: "A skunk's smell can be detected by humans from a mile away." },
+            { category: "🧠 Psychology", fact: "Lethologica describes the state of not being able to remember the word you want." },
+            { category: "👑 Cards", fact: "The king of hearts is the only king without a moustache." },
+            { category: "🚗 Manufacturing", fact: "Henry Ford produced Model T only in black because black paint dried fastest at the time." },
+            { category: "🎮 Gaming", fact: "Mario was originally named Jumpman in 1981's Donkey Kong, renamed after Nintendo's landlord Mario Segali." },
+            { category: "🌏 Fame", fact: "The three best-known Western names in China: Jesus Christ, Richard Nixon, and Elvis Presley." },
+            { category: "⚛️ Biology", fact: "Every year about 98% of the atoms in your body are replaced." },
+            { category: "🐘 Animals", fact: "Elephants are the only mammals that can't jump and have 4 knees." },
+            { category: "📞 Antarctica", fact: "The international telephone dialing code for Antarctica is 672." },
+            { category: "❤️ Human Body", fact: "The human heart creates enough pressure to squirt blood 30 feet." },
+            { category: "🥤 Beverages", fact: "Diet Coke was only invented in 1982." },
+            { category: "🐍 Animals", fact: "When snakes are born with two heads, they fight each other for food." },
+            { category: "🚗 Sound", fact: "American car horns beep in the tone of F." },
+            { category: "🦘 Australia", fact: "There are twice as many kangaroos in Australia as people - about 40 million kangaroos." },
+            { category: "🐕 Police", fact: "Police dogs are trained to react to commands in foreign languages, commonly German or Hungarian." },
+            { category: "💰 Currency", fact: "Australian $5 to $100 notes are made of plastic." },
+            { category: "🍰 Wordplay", fact: "Stressed is desserts spelled backwards." },
+            { category: "👑 Royalty", fact: "Mary Stuart became Queen of Scotland when she was only six days old." },
+            { category: "✈️ Travel", fact: "Flying London to New York by Concorde, you can arrive 2 hours before you leave due to time zones." },
+            { category: "🦷 Hygiene", fact: "Dentists recommend keeping toothbrushes 6 feet from toilets to avoid airborne particles from flushing." },
+            { category: "🔥 Calories", fact: "You burn more calories sleeping than watching TV." },
+            { category: "🦁 Animals", fact: "A lion's roar can be heard from five miles away." },
+            { category: "🥤 Beverages", fact: "7-UP was created in 1929: '7' for 7-ounce containers, 'UP' for bubble direction." },
+            { category: "🧠 Science", fact: "Einstein's brain was 15% wider than normal according to Canadian researchers." },
+            { category: "📞 Communication", fact: "The average person spends about 2 years on the phone in a lifetime." },
+            { category: "📊 Commerce", fact: "Wrigley's gum was the first product to have a bar code." },
+            { category: "👶 Records", fact: "The largest number of children born to one woman is 69 (Russian peasant, 1725-1765)." },
+            { category: "📚 Literature", fact: "Beatrix Potter created the first Peter Rabbit story in 1902." },
+            { category: "👃 Ancient Rome", fact: "In ancient Rome, being born with a crooked nose was considered a sign of leadership." },
+            { category: "📚 Literature", fact: "The word 'nerd' was first coined by Dr. Seuss in 'If I Ran the Zoo'." },
+            { category: "🎺 Music", fact: "The bagpipe was originally made from the whole skin of a dead sheep." },
+            { category: "🐚 Sound", fact: "The roar in seashells is blood surging through ear veins, not the ocean." },
+            { category: "🔫 Weapons", fact: "Revolvers cannot be silenced because of noisy gases escaping the cylinder gap." },
+            { category: "🚗 Efficiency", fact: "Manual transmission cars get 2 miles more per gallon than automatic." },
+            { category: "⚔️ Dueling", fact: "Dueling is legal in Paraguay as long as both parties are registered blood donors." },
+            { category: "🏔️ Geography", fact: "Pennsylvania's highest point is lower than Colorado's lowest point." },
+            { category: "🐴 Military", fact: "The United States has never lost a war in which mules were used." },
+            { category: "🌱 Growth", fact: "Children grow faster in springtime." },
+            { category: "🍔 Food", fact: "On average, there are 178 sesame seeds on each McDonald's Big Mac bun." },
+            { category: "🐎 History", fact: "Paul Revere rode on a horse that belonged to Deacon Larkin." },
+            { category: "🍫 Candy", fact: "Baby Ruth candy bar was named after Grover Cleveland's daughter Ruth." },
+            { category: "🌡️ Temperature", fact: "Minus 40 degrees Celsius equals exactly minus 40 degrees Fahrenheit." },
+            { category: "🔥 Etymology", fact: "'Getting fired' comes from clans burning unwanted people's houses down." },
+            { category: "🏛️ Architecture", fact: "Nobody knows who actually built the Taj Mahal - all credited names are later inventions." },
+            { category: "🧬 Biology", fact: "Every human spent about half an hour as a single cell." },
+            { category: "🦷 Manufacturing", fact: "7.5 million toothpicks can be created from a cord of wood." },
+            { category: "👟 Fashion", fact: "The plastic things on the end of shoelaces are called aglets." },
+            { category: "🚬 History", fact: "The earliest recorded case of quitting smoking was Johan Katsu in 1679 - he died one month later." },
+            { category: "💬 Etymology", fact: "'Goodbye' came from 'God bye' which came from 'God be with you'." },
+            { category: "⛽ Business", fact: "The first drive-in service station was opened by Gulf Oil in Pittsburgh, Pennsylvania on December 1, 1913." },
+            { category: "🚶 Law", fact: "Kansas state law requires pedestrians crossing highways at night to wear tail lights." },
+            
+            // India Facts
+            { category: "🏛️ India Heritage", fact: "India has 43 UNESCO World Heritage Sites, including the Taj Mahal, Qutub Minar, and Sundarbans National Park." },
+            { category: "🕉️ India Religion", fact: "The Kumbh Mela is the world's largest religious gathering, held every 12 years with millions of pilgrims." },
+            { category: "🍛 India Cuisine", fact: "Indian cuisine is world-renowned for bold flavours - curry, biryani, and dosa vary regionally across the country." },
+            { category: "🧘 India Culture", fact: "Yoga originated in India thousands of years ago and is now a global phenomenon for physical, mental, and spiritual benefits." },
+            { category: "🚂 India Transport", fact: "Indian Railways is one of the world's largest employers, covering 68,000 kilometres and employing 1.7 million people." },
+            { category: "🕌 India Architecture", fact: "The Taj Mahal in Agra is one of the New Seven Wonders of the World, built by Emperor Shah Jahan as a symbol of love." },
+            { category: "🏺 India History", fact: "India is home to the Indus Valley Civilisation, one of the world's oldest civilisations from 8,000 years ago." },
+            { category: "🎉 India Festivals", fact: "India celebrates diverse festivals like Diwali, Holi, Eid, and Christmas, reflecting religious diversity and cultural richness." },
+            { category: "🌊 India Rivers", fact: "The Ganges River is sacred in Hinduism - many people make pilgrimages to its banks for purification rituals." },
+            { category: "🎬 India Entertainment", fact: "Bollywood is the world's largest film industry, producing the most films annually with music, drama, and spectacle." },
+            { category: "🏰 India Palaces", fact: "Rajasthan is famous for the vast Thar Desert and opulent palaces like City Palace in Jaipur and Lake Palace in Udaipur." },
+            { category: "📜 India Language", fact: "Sanskrit is one of the world's oldest languages and the basis for many modern Indian languages like Hindi and Bengali." },
+            { category: "🐅 India Wildlife", fact: "India has diverse wildlife including Bengal tigers, Asian elephants, and one-horned rhinoceroses in parks like Ranthambore." },
+            { category: "💊 India Medicine", fact: "Ayurveda is one of the world's oldest holistic healing systems, developed in India over 3,000 years ago." },
+            { category: "🏖️ India Geography", fact: "India has a vast coastline of over 7,500 kilometres with popular destinations like Goa, Kerala, and Andaman Islands." },
+            { category: "🌶️ India Spices", fact: "India is the world's largest spice producer, known as the 'Spice Capital' - exporting pepper, cardamom, and turmeric globally." },
+            { category: "🏔️ India Mountains", fact: "The Himalayas serve as India's natural northern border and are home to the world's highest peaks including Mount Everest." },
+            { category: "🧵 India Textiles", fact: "India's textile industry is famous for colourful fabrics and intricate designs - a leading producer of cotton, silk, and wool." },
+            { category: "🏛️ India Cities", fact: "Varanasi is one of the oldest continuously inhabited cities in the world, located on the Ganges and holy to Hinduism." },
+            { category: "📜 India Government", fact: "India's Constitution, adopted in 1950, is the longest written constitution reflecting the complexity of Indian society." },
+            { category: "🗿 India Monuments", fact: "The Statue of Unity in Gujarat stands at 182 metres, making it the world's tallest statue, dedicated to Sardar Vallabhbhai Patel." },
+            { category: "🛶 India Waterways", fact: "Kerala's backwaters offer unique houseboat experiences through lush landscapes and tranquil waterways." },
+            { category: "🚀 India Space", fact: "India's space program ISRO achieved significant milestones including a successful Mars mission in 2014." },
+            { category: "🗳️ India Democracy", fact: "With 1.4 billion people, India is the world's largest democracy conducting regular elections." },
+            { category: "🏛️ India Religion", fact: "The Golden Temple in Amritsar is the most important Sikh pilgrimage site with stunning gold-plated exterior." },
+            { category: "🌳 India Nature", fact: "The Sundarbans is the world's largest mangrove forest in Bengal region, home to endangered Bengal tigers." },
+            { category: "🏖️ India Beaches", fact: "Chennai's Marina Beach stretches over 13 kilometres, making it one of the world's longest urban beaches." },
+            { category: "🛣️ India Infrastructure", fact: "India has the world's second-largest road network spanning over 6.3 million kilometres connecting remote and urban areas." },
+            { category: "🍵 India Agriculture", fact: "Darjeeling in the Himalayan foothills is renowned for high-quality tea that's exported globally." },
+            { category: "🌍 India Diversity", fact: "India has over 2,000 distinct ethnic groups and 121 languages, showcasing incredible cultural and linguistic diversity." },
+
+            // Weird Historical Facts
+            { category: "🦷 History", fact: "First developed in China around the 15th century, toothbrushes originally had bristles made from the stiff hairs on the back of a pig's neck." },
+            { category: "🎭 History", fact: "The beaked masks of Plague Doctors in the 17th century were early air filtration attempts, filled with aromatic herbs that boosted Europe's perfume industry." },
+            { category: "🎃 History", fact: "According to Irish myth, 'Stingy Jack' tricked the devil and was condemned to roam earth with only a carved turnip and burning coal, leading to Jack-O-Lanterns." },
+            { category: "🧸 History", fact: "Teddy bears are named after President Theodore Roosevelt, who refused to shoot a bear tied to a tree. A candy shop owner created a stuffed bear in his honor." },
+            { category: "🎲 History", fact: "Monopoly was originally called 'The Landlord's Game' in 1903, designed to highlight the negative effects of unregulated capitalism." },
+            { category: "🍫 History", fact: "The ancient Aztecs viewed chocolate as food for the gods and included it in human sacrifices as a symbol of the human heart." },
+            { category: "👠 History", fact: "High heels were invented for men's power - royal men wore them to appear taller, cavalry soldiers used them to lock into stirrups for stability." },
+            { category: "🏃 History", fact: "Treadmills were invented as punishment for prisoners in the early 19th century, now used as medical diagnostic tools and fitness equipment." },
+            { category: "⚡ History", fact: "After seeing a man die from electrocution, dentist Alfred Southwick invented the electric chair as a more humane execution method than hanging." },
+            { category: "🕶️ History", fact: "Invented in 12th-century China, sunglasses were used to hide the emotions of legal officials during court proceedings." },
+            { category: "🚑 History", fact: "The CPR dummy 'Resusci Annie' face is modeled after an unknown French woman found dead in the Seine - her death mask became a pop culture icon." },
+            { category: "🔧 History", fact: "WD-40 was invented to keep rust from forming on the Atlas missile, America's first intercontinental ballistic missile." },
+            { category: "🤧 History", fact: "Kimberly-Clark invented Kleenex material (Cellucotton) as a cotton substitute for medical dressings and gas mask filters." },
+            { category: "🧪 History", fact: "In the 1930s, BPA was originally targeted as an estrogen substitute for women's health but was less effective, so it was used for plastics instead." },
+            { category: "🛏️ History", fact: "Pillows first emerged in Mesopotamia around 7000 BC as stone structures to keep insects away from people's faces while sleeping." },
+            { category: "🍪 History", fact: "Presbyterian minister Sylvester Graham invented graham crackers believing bland food would cure masturbation while rich foods inflamed carnal desires." },
+            { category: "🥤 History", fact: "Nazi Germany created Fanta after a WWII embargo blocked Coca Cola shipments into the country." },
+            { category: "📅 History", fact: "The word 'deadline' comes from Civil War camps - a line around the camp that if crossed, would result in being shot." },
+            { category: "🧽 History", fact: "Lysol was originally marketed as a feminine hygiene product in the early 20th century for 'feminine freshness' and 'marital happiness.'" },
+            { category: "💊 History", fact: "Protective seals on medications were invented because of the 1982 'Tylenol murders' when cyanide-laced Tylenol pills killed seven people." },
+            { category: "🦷 History", fact: "In 1879, Dr. Joseph Lawrence invented Listerine as an antiseptic for surgery, later becoming the first prescription medicine sold over-the-counter for mouth sanitization." },
+
+            // Fashion Facts (Major Selection from 100 Fashion Facts)
+            { category: "👗 Fashion", fact: "In the United States, each person owns an average of seven pairs of blue jeans - one for every day of the week!" },
+            { category: "👗 Fashion", fact: "Women were only allowed to wear shorts publicly after World War II due to fabric shortages making shorts more cost-effective." },
+            { category: "👗 Fashion", fact: "Around two billion T-shirts are sold worldwide every year, making it one of the most popular clothing items." },
+            { category: "👗 Fashion", fact: "The first fashion magazine was sold in Germany in 1586." },
+            { category: "👗 Fashion", fact: "In 1907, a woman was arrested on a Boston beach for wearing a one-piece swimsuit." },
+            { category: "👗 Fashion", fact: "Mark Twain invented the bra clasp." },
+            { category: "👗 Fashion", fact: "The world's longest wedding dress has a 1.85-mile-long train." },
+            { category: "👗 Fashion", fact: "The first pair of Levi's jeans sold for $6 worth of gold dust in 1853." },
+            { category: "👗 Fashion", fact: "Ralph Lauren's real name was Ralph Lifshitz." },
+            { category: "👗 Fashion", fact: "Michael Kors designed his mother's wedding dress when he was five years old." },
+            { category: "👗 Fashion", fact: "Stella McCartney bags are made from corn." },
+            { category: "👗 Fashion", fact: "Before the 19th century, fashion companies used dolls instead of models to showcase clothes." },
+            { category: "👗 Fashion", fact: "Harry Winston's red ruby slippers sold for $3 million." },
+            { category: "👗 Fashion", fact: "The Lacoste crocodile symbol from 1933 was the first designer logo ever." },
+            { category: "👗 Fashion", fact: "Marc Jacobs has a SpongeBob SquarePants tattoo among 27 others." },
+            { category: "👗 Fashion", fact: "Gucci Genius Jeans sold for $3,134." },
+            { category: "👗 Fashion", fact: "In the 1950s, Americans spent 11.5% of income on clothing; now it's 3.5%." },
+            { category: "👗 Fashion", fact: "Queen Victoria was the first to wear a white wedding dress - before this, white was for mourning." },
+            { category: "👗 Fashion", fact: "The average woman buys 145 bags during her lifetime." },
+            { category: "👗 Fashion", fact: "30,000 years ago, needles were made from animal bones." },
+            { category: "👗 Fashion", fact: "Walter Hunt invented the safety pin in 1849." },
+            { category: "👗 Fashion", fact: "High street clothing is designed for people between 5'4\" and 5'8\"." },
+            { category: "👗 Fashion", fact: "Romans created different shoes for left and right feet in 200 AD." },
+            { category: "👗 Fashion", fact: "Eyeliner was discovered in King Tutankhamun's tomb." },
+            { category: "👗 Fashion", fact: "The fashion industry has annual revenue of over $20 billion." },
+            { category: "👗 Fashion", fact: "Items are only 'vintage' if made 60-100 years ago; 'retro' copies vintage styles." },
+            { category: "👗 Fashion", fact: "Chanel No. 5 marked the beginning of modern perfume in 1921." },
+            { category: "👗 Fashion", fact: "100 years ago, short hair on women suggested infidelity to their husbands." },
+            { category: "👗 Fashion", fact: "Tie collectors are called grabatologists." },
+            { category: "👗 Fashion", fact: "During the Renaissance, it was fashionable to shave off eyebrows." },
+            { category: "👗 Fashion", fact: "Elizabeth I fined women who didn't wear hats on Sundays and holidays." },
+            { category: "👗 Fashion", fact: "Men didn't wear underwear until the 17th century." },
+            { category: "👗 Fashion", fact: "One bale of cotton can make around 200 pairs of jeans." },
+            { category: "👗 Fashion", fact: "80% of women buy shoes too small for their feet." },
+            { category: "👗 Fashion", fact: "Baggy pants were first worn in LA prisons since inmates couldn't wear belts." },
+            { category: "👗 Fashion", fact: "Ancient Romans wore yellow clothing on wedding days." },
+            { category: "👗 Fashion", fact: "US police wear blue uniforms because blue represents loyalty." },
+            { category: "👗 Fashion", fact: "Lipstick's main ingredient is fish scales." },
+            { category: "👗 Fashion", fact: "Cardigans were originally designed as knitted military jackets." },
+            { category: "👗 Fashion", fact: "Medieval people often paid taxes with clothing or materials." },
+            { category: "👗 Fashion", fact: "7 million tons of textiles are trashed yearly, only 12% recycled." },
+            { category: "👗 Fashion", fact: "The tuxedo gets its name from Tuxedo, Orange County, where it was first worn." },
+            { category: "👗 Fashion", fact: "Baby boys wore dresses until age 5-6, stopping in 1910." },
+            { category: "👗 Fashion", fact: "The bikini was banned in several countries including Italy after Vatican called it sinful." },
+            { category: "👗 Fashion", fact: "Playtex made spacesuits for Neil Armstrong and Buzz Aldrin." },
+            { category: "👗 Fashion", fact: "In the 1600s, women put cushions under clothes to fake pregnancy bumps." },
+            { category: "👗 Fashion", fact: "Manhattan residents spend the most on clothing - $362 per month average." },
+            { category: "👗 Fashion", fact: "China supplies over 90 million yards of cotton to fashion industry yearly." },
+            { category: "👗 Fashion", fact: "Neckties, originally called cravats, came from Croatia and are the most popular Father's Day gift." },
+            { category: "👗 Fashion", fact: "Handbags were designed to help women attract husbands with embroidered patterns." },
+            { category: "👗 Fashion", fact: "Original Cinderella wore fur slippers, not glass - changed in the 1600s." },
+            { category: "👗 Fashion", fact: "Japanese warriors wore ponytails to keep helmets secure, not for fashion." },
+            { category: "👗 Fashion", fact: "Judges' wigs date back to King Louis XIII who wore them to hide bald patches." },
+
+            // Fruit Facts
+            { category: "🍎 Food", fact: "Kiwifruit actually originated in China under a name meaning 'macaque peach' due to its popularity with local monkeys." },
+            { category: "🍎 Food", fact: "New Zealand changed the Chinese gooseberry's name to 'kiwifruit' during the Cold War because nothing associated with Red China was profitable." },
+            { category: "🍍 Food", fact: "Pineapples were so rare in colonial America that producers rented them to hostesses for display, then sold them as food afterward." },
+            { category: "🍅 Food", fact: "Europeans thought tomatoes were poisonous for over two centuries because the fruit's acidity released deadly lead from pewter plates." },
+            { category: "🍅 Food", fact: "The Civil War brought tomatoes into the spotlight in America, helping overcome rural settlers' fears about the fruit." },
+
+            // Everyday Objects Facts
+            { category: "🍴 History", fact: "In the 11th century, a Byzantine princess introduced forks to Italy, but they were seen as excessive and immoral before the 18th century." },
+            { category: "👠 History", fact: "Persian cavalry first wore high heels to secure their feet in stirrups - European aristocracy adopted them to appear taller and more powerful." },
+            { category: "💄 History", fact: "Cleopatra made lipstick from crushed beetles and ants, but lip color was first used over 5,000 years ago by the Sumerians." },
+            { category: "☂️ History", fact: "Umbrellas originated in ancient Mesopotamia as sunshades for royalty - in England, men were ridiculed for using them as they were seen as feminine." },
+
+            // Random Fun Facts
+            { category: "🌟 Random", fact: "Laughter triggers the release of endorphins, the body's natural feel-good chemicals." },
+            { category: "🌟 Random", fact: "The scientific term for the urge to squeeze cute things is called 'cute aggression.'" },
+            { category: "🌟 Random", fact: "Physical touch like hugging releases oxytocin, often called the 'bonding hormone.'" },
+            { category: "🌟 Random", fact: "The word 'serendipity' means finding something good without looking for it." }
+        ];
+
+        function getRandomFact() {
+            let randomIndex = Math.floor(Math.random() * facts.length);
+            let selectedFact = facts[randomIndex];
+            displayFact(selectedFact);
+        }
+
+        function getFactByCategory(categoryFilter) {
+            let categoryFacts = facts.filter(fact => 
+                fact.category.toLowerCase().includes(categoryFilter.toLowerCase())
+            );
+            
+            if (categoryFacts.length === 0) return;
+            
+            let randomIndex = Math.floor(Math.random() * categoryFacts.length);
+            let selectedFact = categoryFacts[randomIndex];
+            displayFact(selectedFact);
+        }
+
+        function displayFact(selectedFact) {
+            const factCard = document.getElementById('factCard');
+            factCard.innerHTML = `
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-pink-600 mb-4">${selectedFact.category}</div>
+                    <p class="text-gray-700 text-lg leading-relaxed">${selectedFact.fact}</p>
+                </div>
+            `;
+        }
+
+        function openRulesModal() {
+            document.getElementById('rulesModal').classList.remove('hidden');
+            document.getElementById('rulesModal').classList.add('flex');
+        }
+
+        function closeRulesModal() {
+            document.getElementById('rulesModal').classList.add('hidden');
+            document.getElementById('rulesModal').classList.remove('flex');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('rulesModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeRulesModal();
+            }
+        });
+    </script>
+</body>
+</html>

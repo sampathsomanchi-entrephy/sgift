@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>What Do You Meme</title>
+    <title>We're Not Really Strangers</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body class="bg-gradient-to-br from-pink-50 to-white min-h-screen">
     <div id="app">
@@ -16,54 +15,56 @@
                 <button onclick="openRulesModal()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Rules</button>
             </div>
             <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-4 sm:p-8">
-                <h2 class="text-2xl sm:text-3xl font-bold text-pink-600 mb-6 text-center">😂 What Do You Meme</h2>
+                <h2 class="text-2xl sm:text-3xl font-bold text-pink-600 mb-6 text-center">💕 We're Not Really Strangers</h2>
                 
-                <div v-if="!gameStarted" class="text-center space-y-4">
-                    <p class="text-gray-700">Create hilarious memes with personalized situations!</p>
-                    <button @click="startGame" class="bg-pink-500 text-white px-8 py-3 rounded-lg hover:bg-pink-600 text-lg font-bold">Start Game</button>
+                <div v-if="!gameStarted" class="text-center space-y-6">
+                    <p class="text-gray-700 text-lg">Choose your level of intimacy and connection</p>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <button @click="selectLevel(1)" class="bg-green-100 border-2 border-green-300 p-6 rounded-lg hover:bg-green-200 transition-colors">
+                            <h3 class="text-xl font-bold text-green-700 mb-2">Level 1</h3>
+                            <p class="text-green-600">Perception</p>
+                            <p class="text-sm text-green-500 mt-2">Getting to know each other</p>
+                        </button>
+                        
+                        <button @click="selectLevel(2)" class="bg-purple-100 border-2 border-purple-300 p-6 rounded-lg hover:bg-purple-200 transition-colors">
+                            <h3 class="text-xl font-bold text-purple-700 mb-2">Level 2</h3>
+                            <p class="text-purple-600">Connection</p>
+                            <p class="text-sm text-purple-500 mt-2">Deeper conversations</p>
+                        </button>
+                        
+                        <button @click="selectLevel(3)" class="bg-pink-100 border-2 border-pink-300 p-6 rounded-lg hover:bg-pink-200 transition-colors">
+                            <h3 class="text-xl font-bold text-pink-700 mb-2">Level 3</h3>
+                            <p class="text-pink-600">Reflection</p>
+                            <p class="text-sm text-pink-500 mt-2">Most intimate questions</p>
+                        </button>
+                    </div>
                 </div>
 
                 <div v-if="gameStarted" class="space-y-6">
-                    <!-- Meme Situation -->
-                    <div class="bg-gray-100 p-6 rounded-lg text-center">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">Meme This Situation:</h3>
-                        <div class="text-xl font-bold text-pink-600 leading-relaxed">
-                            {{ currentSituation }}
+                    <!-- Level Indicator -->
+                    <div class="text-center">
+                        <div :class="levelColor" class="inline-block px-6 py-2 rounded-full text-white font-bold">
+                            Level {{ currentLevel }}: {{ levelName }}
                         </div>
+                        <div class="text-sm text-gray-500 mt-2">Question {{ currentQuestionIndex + 1 }} of {{ currentQuestions.length }}</div>
                     </div>
 
-                    <!-- Caption Options -->
-                    <div class="space-y-4">
-                        <h3 class="text-lg font-bold text-gray-800 text-center">Choose Your Caption:</h3>
-                        <div class="grid grid-cols-1 gap-3">
-                            <button v-for="(caption, index) in captionOptions" :key="index"
-                                    @click="selectCaption(index)"
-                                    :class="selectedCaption === index ? 'bg-pink-500 text-white' : 'bg-white border-2 border-pink-200 text-gray-800 hover:bg-pink-50'"
-                                    class="p-4 rounded-lg text-left font-medium transition-colors">
-                                {{ caption }}
-                            </button>
+                    <!-- Question Card -->
+                    <div class="bg-gray-50 p-8 rounded-lg text-center min-h-48 flex items-center justify-center">
+                        <div class="text-xl sm:text-2xl font-medium text-gray-800 leading-relaxed">
+                            {{ currentQuestion }}
                         </div>
                     </div>
 
                     <!-- Action Buttons -->
-                    <div class="text-center space-y-4">
-                        <button v-if="selectedCaption !== null" @click="revealMeme" 
-                                class="bg-green-500 text-white px-8 py-3 rounded-lg hover:bg-green-600 text-lg font-bold">
-                            Create Meme! 🎨
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button @click="nextQuestion" class="bg-pink-500 text-white px-8 py-3 rounded-lg hover:bg-pink-600 text-lg font-bold">
+                            Next Question →
                         </button>
-                        
-                        <div v-if="showResult" class="space-y-4">
-                            <div class="bg-pink-100 p-6 rounded-lg">
-                                <h3 class="text-xl font-bold text-pink-700 mb-4">Your Meme:</h3>
-                                <div class="bg-white p-4 rounded border-2 border-pink-300">
-                                    <div class="text-sm text-gray-600 mb-2">{{ currentSituation }}</div>
-                                    <div class="text-lg font-bold text-gray-800">{{ captionOptions[selectedCaption] }}</div>
-                                </div>
-                            </div>
-                            <button @click="nextMeme" class="bg-pink-500 text-white px-8 py-3 rounded-lg hover:bg-pink-600 text-lg font-bold">
-                                Next Meme →
-                            </button>
-                        </div>
+                        <button @click="changeLevel" class="bg-gray-400 text-white px-8 py-3 rounded-lg hover:bg-gray-500 text-lg">
+                            Change Level
+                        </button>
                     </div>
                 </div>
             </div>
@@ -74,18 +75,19 @@
     <div id="rulesModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
         <div class="bg-white rounded-lg shadow-xl p-4 sm:p-8 max-w-2xl mx-4 relative">
             <button onclick="closeRulesModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
-            <h2 class="text-2xl sm:text-3xl font-bold text-pink-600 mb-6 text-center">😂 What Do You Meme Rules</h2>
+            <h2 class="text-2xl sm:text-3xl font-bold text-pink-600 mb-6 text-center">💕 We're Not Really Strangers Rules</h2>
             <div class="text-left space-y-4">
                 <p class="text-lg text-gray-700"><strong>How to Play:</strong></p>
                 <ul class="list-disc list-inside text-gray-700 space-y-2">
-                    <li>Read the situation presented</li>
-                    <li>Choose the funniest caption from the options</li>
-                    <li>Click "Create Meme!" to see your creation</li>
-                    <li>Share and laugh at the personalized meme</li>
-                    <li>Click "Next Meme" for a new situation</li>
-                    <li>Situations are based on your interests and relationships!</li>
+                    <li><strong>Level 1 (Perception):</strong> Surface-level questions to break the ice</li>
+                    <li><strong>Level 2 (Connection):</strong> Deeper questions about values and experiences</li>
+                    <li><strong>Level 3 (Reflection):</strong> Most intimate questions about fears, dreams, and vulnerabilities</li>
+                    <li>Take turns asking and answering questions</li>
+                    <li>Be honest and open in your responses</li>
+                    <li>Listen without judgment</li>
+                    <li>You can change levels anytime</li>
                 </ul>
-                <p class="text-sm text-gray-600 mt-4"><em>Perfect for creating inside jokes and funny moments!</em></p>
+                <p class="text-sm text-gray-600 mt-4"><em>Perfect for couples, friends, or anyone wanting to connect more deeply!</em></p>
             </div>
         </div>
     </div>
@@ -96,112 +98,262 @@
         createApp({
             data() {
                 return {
-                    situations: [],
-                    captions: [],
-                    currentSituationIndex: 0,
-                    captionOptions: [],
-                    selectedCaption: null,
+                    currentLevel: 1,
+                    currentQuestionIndex: 0,
                     gameStarted: false,
-                    showResult: false
+                    questions: {
+                        1: [], // Current 20 questions for level 1
+                        2: [], // Current 20 questions for level 2  
+                        3: []  // Current 20 questions for level 3
+                    },
+                    allQuestions: {
+                        1: [], // All 60 questions for level 1
+                        2: [], // All 60 questions for level 2
+                        3: []  // All 60 questions for level 3
+                    }
                 }
             },
             computed: {
-                currentSituation() {
-                    return this.situations[this.currentSituationIndex] || '';
+                currentQuestions() {
+                    return this.questions[this.currentLevel] || [];
+                },
+                currentQuestion() {
+                    return this.currentQuestions[this.currentQuestionIndex] || '';
+                },
+                levelName() {
+                    const names = { 1: 'Perception', 2: 'Connection', 3: 'Reflection' };
+                    return names[this.currentLevel];
+                },
+                levelColor() {
+                    const colors = { 1: 'bg-green-500', 2: 'bg-purple-500', 3: 'bg-pink-500' };
+                    return colors[this.currentLevel];
                 }
             },
             methods: {
-                async loadContent() {
-                    // Meme situations based on interests
-                    this.situations = [
-                        "When Sampath suggests watching The Office again but you want to watch Friends",
-                        "When you're crocheting and someone asks if you can make them a sweater by tomorrow",
-                        "When Steph texts you at 2am with relationship drama",
-                        "When you're at a Thai restaurant and they ask 'how spicy' on a scale of 1-10",
-                        "When Taylor Swift drops a surprise album and you haven't finished processing the last one",
-                        "When you're playing tennis and the ball hits you instead of your racket",
-                        "When someone says they don't like gulab jamun",
-                        "When you're baking and realize you forgot a key ingredient halfway through",
-                        "When Grisha and Stan invite you on a double date to a place you've never heard of",
-                        "When you're watching Brooklyn Nine-Nine and someone says 'this isn't realistic'",
-                        "When you're doing pilates and the instructor says 'just one more rep'",
-                        "When someone asks if you can teach them to crochet in 5 minutes",
-                        "When you're at a picnic and it starts raining",
-                        "When Ed Sheeran comes on the radio for the 10th time today",
-                        "When you're gardening and find a bug",
-                        "When someone suggests pineapple on pizza",
-                        "When you're reading a romance book and someone spoils the ending",
-                        "When you're making clay pottery and it collapses",
-                        "When someone says they've never seen Friends",
-                        "When you're at a concert and can't see over the tall person in front of you"
+                loadQuestions() {
+                    // Level 1: Perception (60 questions - getting to know each other)
+                    const level1Questions = [
+                        "What's your favorite way to spend a weekend?",
+                        "If you could have dinner with anyone, who would it be?",
+                        "What's something you're really passionate about?",
+                        "What's your biggest pet peeve?",
+                        "What's the best compliment you've ever received?",
+                        "What's your go-to comfort food?",
+                        "What's something you've always wanted to learn?",
+                        "What's your favorite childhood memory?",
+                        "What's the most spontaneous thing you've ever done?",
+                        "What's your ideal way to relax after a stressful day?",
+                        "What's something about you that would surprise people?",
+                        "What's your favorite thing about where you grew up?",
+                        "What's a skill you wish you had?",
+                        "What's your favorite season and why?",
+                        "What's the best advice you've ever received?",
+                        "Which Taylor Swift song describes your current mood?",
+                        "If you had to choose between Thai food and Indian food forever, which would it be?",
+                        "What's your favorite thing about Steph as a friend?",
+                        "Which Brooklyn Nine-Nine character are you most like and why?",
+                        "What's your favorite dessert: gulab jamun or pistachio ice cream?",
+                        "If you could binge-watch one show with me, what would it be?",
+                        "What's your ideal picnic setup?",
+                        "Which Ed Sheeran song makes you think of us?",
+                        "What's something about your family that always makes you smile?",
+                        "What's your favorite memory with your siblings?",
+                        "How do you like to celebrate special occasions?",
+                        "What's your favorite thing to do when you're home alone?",
+                        "What's a hobby you'd like to try together?",
+                        "What's your favorite type of date night?",
+                        "What's something you find attractive in people?",
+                        "What's your favorite way to show affection?",
+                        "What's a place you've always wanted to visit?",
+                        "What's your favorite thing about our relationship so far?",
+                        "What's something you're naturally good at?",
+                        "What's your favorite way to spend time with friends?",
+                        "What's a tradition from your family that you love?",
+                        "What's your favorite thing to cook or bake?",
+                        "What's something that always makes you laugh?",
+                        "What's your favorite way to exercise or stay active?",
+                        "What's a book or movie that changed your perspective?",
+                        "What's your favorite thing about your job or studies?",
+                        "What's something you're looking forward to this year?",
+                        "What's your favorite way to spend a rainy day?",
+                        "What's something you collect or used to collect?",
+                        "What's your favorite childhood game or activity?",
+                        "What's something you're proud of accomplishing recently?",
+                        "What's your favorite way to treat yourself?",
+                        "What's a compliment you remember receiving as a child?",
+                        "What's your favorite thing about your best friend?",
+                        "What's something you're excited to learn more about?",
+                        "What's your favorite family recipe or dish?",
+                        "What's something that makes you feel confident?",
+                        "What's your favorite way to connect with nature?",
+                        "What's a goal you're working towards right now?",
+                        "What's your favorite thing about your hometown?",
+                        "What's something you're grateful for today?",
+                        "What's your favorite way to be creative?",
+                        "What's something you find beautiful in everyday life?",
+                        "What's your favorite way to make someone's day better?",
+                        "What's something you're curious about?"
                     ];
 
-                    // Generic funny captions
-                    this.captions = [
-                        "This is fine.",
-                        "I don't think so, buddy.",
-                        "Excuse me, what?",
-                        "Not today, Satan.",
-                        "I'm about to end this whole career.",
-                        "Why are you like this?",
-                        "I can't even...",
-                        "The audacity!",
-                        "Ma'am, this is a Wendy's.",
-                        "I'm not mad, just disappointed.",
-                        "That's a no from me, dawg.",
-                        "You had one job.",
-                        "I'm too old for this.",
-                        "What in the world?",
-                        "Absolutely not.",
-                        "I'm calling the police.",
-                        "This ain't it, chief.",
-                        "I'm done.",
-                        "The disrespect!",
-                        "I'm shook.",
-                        "That's sus.",
-                        "Big yikes.",
-                        "I'm deceased.",
-                        "This is chaos.",
-                        "I'm living for this drama.",
-                        "That's a whole mood.",
-                        "I'm weak.",
-                        "This is sending me.",
-                        "I'm crying.",
-                        "That's actually iconic."
+                    // Level 2: Connection (60 questions - deeper conversations)
+                    const level2Questions = [
+                        "What's something you're struggling with right now?",
+                        "What's a belief you held strongly but changed your mind about?",
+                        "What's your biggest fear in relationships?",
+                        "What's something you're proud of but don't talk about much?",
+                        "What's a time when you felt truly understood?",
+                        "What's something you wish people knew about you?",
+                        "What's a mistake you made that taught you something important?",
+                        "What's something you're working on improving about yourself?",
+                        "What's a time when you felt completely out of your comfort zone?",
+                        "What's something you need more of in your life?",
+                        "What's a quality you admire in others but struggle with yourself?",
+                        "What's something you've forgiven someone for that was hard to forgive?",
+                        "What's a dream you've given up on? Do you regret it?",
+                        "What's something you wish you could tell your younger self?",
+                        "What's a time when you felt most proud of yourself?",
+                        "What does our relationship mean to you compared to your friendship with Steph?",
+                        "How do you feel when your family asks about our future together?",
+                        "What's something about me that reminds you of a character from Friends?",
+                        "When you're crocheting, what do you think about most?",
+                        "What's a fear you have about us that you haven't shared?",
+                        "How do you want Grisha and Stan to see our relationship?",
+                        "What's something you learned from watching your parents' relationship?",
+                        "When do you feel most like yourself around me?",
+                        "What's a dream you have for us that scares you to say out loud?",
+                        "How has your relationship with your siblings shaped how you love?",
+                        "What's something you wish you were better at communicating?",
+                        "What's a time when you felt misunderstood by someone close to you?",
+                        "What's something you're afraid of losing?",
+                        "What's a pattern in your relationships that you want to change?",
+                        "What's something you wish your parents understood about you?",
+                        "What's a time when you had to choose between two important things?",
+                        "What's something you're insecure about that affects how you act?",
+                        "What's a way you've grown in the past year?",
+                        "What's something you wish you could change about your past?",
+                        "What's a time when you felt truly supported by someone?",
+                        "What's something you're afraid to ask for help with?",
+                        "What's a boundary you wish you were better at setting?",
+                        "What's something you judge yourself too harshly for?",
+                        "What's a time when you disappointed someone you care about?",
+                        "What's something you wish you had more courage to do?",
+                        "What's a way you show love that others might not recognize?",
+                        "What's something you're afraid people assume about you?",
+                        "What's a time when you felt like you didn't belong?",
+                        "What's something you wish you could change about how you handle conflict?",
+                        "What's a time when you had to stand up for something you believed in?",
+                        "What's something you're afraid of becoming like your parents in?",
+                        "What's a way you've been hurt that still affects you?",
+                        "What's something you wish you could tell someone but haven't?",
+                        "What's a time when you felt truly seen by someone?",
+                        "What's something you're working on accepting about yourself?",
+                        "What's a way you sabotage yourself without meaning to?",
+                        "What's something you wish you could change about your family dynamics?",
+                        "What's a time when you felt like you let yourself down?",
+                        "What's something you're afraid to hope for?",
+                        "What's a way you've changed that you're proud of?",
+                        "What's something you wish you could forgive yourself for?",
+                        "What's a time when you felt most connected to someone?",
+                        "What's something you're afraid of repeating from your past?",
+                        "What's a way you wish you could better support the people you love?",
+                        "What's something you're learning to be more patient with yourself about?"
                     ];
 
-                    // Start with random situation
-                    this.currentSituationIndex = Math.floor(Math.random() * this.situations.length);
+                    // Level 3: Reflection (60 questions - most intimate)
+                    const level3Questions = [
+                        "What's your deepest fear about the future?",
+                        "What's something you've never told anyone?",
+                        "What's a time when you felt most vulnerable?",
+                        "What's something you're ashamed of?",
+                        "What's your biggest regret in life?",
+                        "What's something you wish you could change about your past?",
+                        "What's a time when you felt completely alone?",
+                        "What's something you're afraid to admit you want?",
+                        "What's a way you've hurt someone that you still think about?",
+                        "What's something you judge yourself harshly for?",
+                        "What's a part of yourself you try to hide from others?",
+                        "What's something you're afraid people will discover about you?",
+                        "What's a time when you disappointed yourself?",
+                        "What's something you wish you had the courage to do?",
+                        "What's a truth about yourself that's hard to accept?",
+                        "What's something you're afraid to tell your parents about us?",
+                        "How do you really feel when people ask when we're getting married?",
+                        "What's your biggest fear about me meeting your extended family?",
+                        "Is there something about your friendship with Steph that you're protective of?",
+                        "What's something you wish you could change about how your family sees me?",
+                        "What's a moment with me that you replay when you're feeling insecure?",
+                        "What's something you're afraid I'll discover about you?",
+                        "How do you feel about the way Charlie or Hannah sees our relationship?",
+                        "What's something you wish you could tell your younger self about love?",
+                        "What's your deepest fear about us living together or getting married?",
+                        "What's something you're afraid to need from me?",
+                        "What's a way you're afraid you might hurt me?",
+                        "What's something about your family that you're embarrassed by?",
+                        "What's a fear you have about becoming like your parents?",
+                        "What's something you're afraid to lose about yourself in a relationship?",
+                        "What's a way you've been selfish that you regret?",
+                        "What's something you're afraid to be honest about with your friends?",
+                        "What's a time when you felt like a fraud or imposter?",
+                        "What's something you're afraid people would think if they knew the real you?",
+                        "What's a way you've betrayed your own values?",
+                        "What's something you're afraid to grieve or let go of?",
+                        "What's a part of your childhood that still hurts?",
+                        "What's something you're afraid to want too much?",
+                        "What's a way you're afraid you're not good enough?",
+                        "What's something you're afraid to depend on someone for?",
+                        "What's a time when you felt like you couldn't trust your own judgment?",
+                        "What's something you're afraid to be vulnerable about?",
+                        "What's a way you're afraid you might repeat your parents' mistakes?",
+                        "What's something you're afraid to admit you need help with?",
+                        "What's a fear you have about your own capacity to love?",
+                        "What's something you're afraid to confront about yourself?",
+                        "What's a way you're afraid you might sabotage our relationship?",
+                        "What's something you're afraid to hope for in our future?",
+                        "What's a part of yourself you're afraid I won't be able to love?",
+                        "What's something you're afraid to ask me for?",
+                        "What's a way you're afraid you might disappoint me?",
+                        "What's something about your past that you're afraid will affect our future?",
+                        "What's a fear you have about your own worthiness of love?",
+                        "What's something you're afraid to trust me with?",
+                        "What's a way you're afraid you might not be enough for me?",
+                        "What's something you're afraid to believe about us?",
+                        "What's a part of your heart that you're afraid to fully open?",
+                        "What's something you're afraid to let yourself want from this relationship?",
+                        "What's a fear you have about your ability to be the partner I need?",
+                        "What's something you're afraid to surrender control of in our relationship?"
+                    ];
+
+                    // Assign full question sets
+                    this.allQuestions = {
+                        1: level1Questions,
+                        2: level2Questions,
+                        3: level3Questions
+                    };
+
+                    // Initialize with empty arrays
+                    this.questions = { 1: [], 2: [], 3: [] };
                 },
-                startGame() {
+                selectLevel(level) {
+                    this.currentLevel = level;
+                    this.currentQuestionIndex = 0;
                     this.gameStarted = true;
-                    this.generateCaptionOptions();
+                    // Pick 20 random questions from the 60 available for this level
+                    const shuffled = [...this.allQuestions[level]].sort(() => Math.random() - 0.5);
+                    this.questions[level] = shuffled.slice(0, 20);
                 },
-                generateCaptionOptions() {
-                    // Pick 4 random captions
-                    const shuffled = [...this.captions].sort(() => Math.random() - 0.5);
-                    this.captionOptions = shuffled.slice(0, 4);
-                    this.selectedCaption = null;
-                    this.showResult = false;
+                nextQuestion() {
+                    if (this.currentQuestionIndex < this.currentQuestions.length - 1) {
+                        this.currentQuestionIndex++;
+                    } else {
+                        this.currentQuestionIndex = 0; // Loop back to start
+                    }
                 },
-                selectCaption(index) {
-                    this.selectedCaption = index;
-                },
-                revealMeme() {
-                    this.showResult = true;
-                    confetti({
-                        particleCount: 100,
-                        spread: 70,
-                        origin: { y: 0.6 }
-                    });
-                },
-                nextMeme() {
-                    this.currentSituationIndex = (this.currentSituationIndex + 1) % this.situations.length;
-                    this.generateCaptionOptions();
+                changeLevel() {
+                    this.gameStarted = false;
                 }
             },
             mounted() {
-                this.loadContent();
+                this.loadQuestions();
             }
         }).mount('#app');
 

@@ -23,36 +23,75 @@
                     <button @click="startGame" class="bg-pink-500 text-white px-8 py-3 rounded-lg hover:bg-pink-600 text-lg font-bold">Start Game</button>
                 </div>
 
-                <div v-if="gameStarted" class="space-y-6">
+                <div v-if="gameStarted && !gameComplete" class="space-y-6">
                     <div class="bg-pink-100 p-4 rounded-lg">
                         <h3 class="text-xl font-bold text-pink-700 mb-2">Round {{ currentRound }}: {{ roundName }}</h3>
                         <p class="text-pink-600">{{ roundDescription }}</p>
-                        <div class="mt-2 text-sm text-pink-500">Card {{ currentCardIndex + 1 }} of {{ cards.length }}</div>
+                        <div class="mt-2 text-sm text-pink-500">{{ usedCards.length }} of {{ cards.length }} cards used</div>
                     </div>
 
-                    <div class="bg-gray-100 p-6 rounded-lg min-h-32">
-                        <div v-if="showCard" class="text-lg sm:text-xl font-bold text-gray-800 leading-relaxed">
-                            {{ currentCard }}
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="bg-blue-100 p-3 rounded-lg text-center">
+                            <div class="font-bold text-blue-700">Team 1</div>
+                            <div class="text-2xl font-bold text-blue-800">{{ team1Score }}</div>
                         </div>
-                        <div v-else class="text-gray-500 italic">
-                            Card hidden - click Show to reveal
+                        <div class="bg-red-100 p-3 rounded-lg text-center">
+                            <div class="font-bold text-red-700">Team 2</div>
+                            <div class="text-2xl font-bold text-red-800">{{ team2Score }}</div>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2 mb-4">
-                        <button @click="showCard = false" class="bg-pink-500 text-white px-3 py-2 rounded-lg hover:bg-pink-600">Hide</button>
-                        <button @click="showCard = true" class="bg-pink-500 text-white px-3 py-2 rounded-lg hover:bg-pink-600">Show</button>
+                    <div v-if="!turnActive && !roundComplete" class="bg-yellow-100 p-4 rounded-lg text-center">
+                        <h4 class="text-lg font-bold text-yellow-700 mb-2">Team {{ currentTeam }}'s Turn</h4>
+                        <button @click="startTurn" class="bg-yellow-500 text-white px-6 py-3 rounded-lg hover:bg-yellow-600 font-bold">Start 1 Minute Timer</button>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <button @click="gotIt" class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 text-lg font-bold">Got it! 🎉</button>
-                        <button @click="nextCard" class="bg-gray-400 text-white px-6 py-3 rounded-lg hover:bg-gray-500 text-lg font-bold">Skip →</button>
+                    <div v-if="turnActive" class="space-y-4">
+                        <div class="bg-red-100 p-4 rounded-lg text-center">
+                            <div class="text-3xl font-bold text-red-700">{{ timeLeft }}s</div>
+                            <div class="text-red-600">Team {{ currentTeam }} - {{ roundName }}</div>
+                        </div>
+
+                        <div class="bg-gray-100 p-6 rounded-lg min-h-32">
+                            <div class="text-lg sm:text-xl font-bold text-gray-800 leading-relaxed mb-4">
+                                {{ currentCard.prompt }}
+                            </div>
+                            <div v-if="showDescription" class="text-sm text-gray-600 italic border-t pt-2">
+                                💡 {{ currentCard.desc }}
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <button @click="showDescription = !showDescription" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                                {{ showDescription ? 'Hide' : 'Show' }} Hint
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <button @click="gotIt" class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 text-lg font-bold">Got it! 🎉</button>
+                            <button @click="skipCard" class="bg-gray-400 text-white px-6 py-3 rounded-lg hover:bg-gray-500 text-lg font-bold">Skip →</button>
+                        </div>
                     </div>
 
-                    <div v-if="roundComplete" class="mt-6 p-4 bg-green-100 rounded-lg">
-                        <p class="text-green-700 font-bold">Round {{ currentRound }} Complete!</p>
-                        <button v-if="currentRound < 3" @click="nextRound" class="mt-2 bg-pink-500 text-white px-6 py-3 rounded-lg hover:bg-pink-600">Next Round →</button>
-                        <button v-else @click="endGame" class="mt-2 bg-purple-500 text-white px-6 py-3 rounded-lg hover:bg-purple-600">Game Complete! 🎊</button>
+                    <div v-if="roundComplete" class="mt-6 p-4 bg-green-100 rounded-lg text-center">
+                        <p class="text-green-700 font-bold mb-2">Round {{ currentRound }} Complete!</p>
+                        <p class="text-green-600 mb-4">Team 1: {{ team1Score }} | Team 2: {{ team2Score }}</p>
+                        <button v-if="currentRound < 3" @click="nextRound" class="bg-pink-500 text-white px-6 py-3 rounded-lg hover:bg-pink-600">Next Round →</button>
+                        <button v-else @click="endGame" class="bg-purple-500 text-white px-6 py-3 rounded-lg hover:bg-purple-600">Game Complete! 🎊</button>
+                    </div>
+                </div>
+
+                <div v-if="gameComplete" class="space-y-6 text-center">
+                    <div class="bg-purple-100 p-6 rounded-lg">
+                        <h3 class="text-2xl font-bold text-purple-700 mb-4">🎊 Game Complete! 🎊</h3>
+                        <div class="text-xl mb-4">
+                            <div class="mb-2">Team 1: {{ team1Score }} points</div>
+                            <div class="mb-4">Team 2: {{ team2Score }} points</div>
+                            <div class="text-2xl font-bold text-purple-800">
+                                {{ team1Score > team2Score ? '🥇 Team 1 Wins!' : team2Score > team1Score ? '🥇 Team 2 Wins!' : '🤝 It\'s a Tie!' }}
+                            </div>
+                        </div>
+                        <button @click="resetGame" class="bg-pink-500 text-white px-6 py-3 rounded-lg hover:bg-pink-600">Play Again</button>
                     </div>
                 </div>
             </div>
@@ -67,14 +106,19 @@
             <div class="text-left space-y-4">
                 <p class="text-lg text-gray-700"><strong>How to Play:</strong></p>
                 <ul class="list-disc list-inside text-gray-700 space-y-2">
+                    <li><strong>Teams:</strong> Split into Team 1 and Team 2</li>
+                    <li><strong>Turns:</strong> Teams alternate 1-minute turns</li>
+                    <li><strong>Shared Deck:</strong> Same 20 cards used by both teams each round</li>
                     <li><strong>Round 1:</strong> Describe the card using any words (no names)</li>
                     <li><strong>Round 2:</strong> Use only ONE word to describe the card</li>
                     <li><strong>Round 3:</strong> Only gestures and sounds - no words!</li>
-                    <li>Same cards are used in all 3 rounds</li>
-                    <li>Use Hide/Show to control when others see the card</li>
-                    <li>Hit "Got it!" when guessed correctly, "Skip" to move on</li>
+                    <li>Round advances when all cards are used</li>
+                    <li>Use "Show Hint" button if you need help with a card</li>
+                    <li>Hit "Got it!" when guessed correctly to score a point</li>
+                    <li>Hit "Skip" to move to the next card</li>
+                    <li>Most points after 3 rounds wins!</li>
                 </ul>
-                <p class="text-sm text-gray-600 mt-4"><em>Gets easier each round as you remember the cards!</em></p>
+                <p class="text-sm text-gray-600 mt-4"><em>Cards include TV characters doing silly things, friends, and funny scenarios!</em></p>
             </div>
         </div>
     </div>
@@ -86,17 +130,23 @@
             data() {
                 return {
                     cards: [],
+                    usedCards: [],
                     currentCardIndex: 0,
                     currentRound: 1,
                     gameStarted: false,
-                    showCard: false,
-                    roundComplete: false,
-                    completedCards: []
+                    currentTeam: 1,
+                    team1Score: 0,
+                    team2Score: 0,
+                    timeLeft: 60,
+                    timerRunning: false,
+                    turnActive: false,
+                    gameComplete: false,
+                    showDescription: false
                 }
             },
             computed: {
                 currentCard() {
-                    return this.cards[this.currentCardIndex] || '';
+                    return this.cards[this.currentCardIndex] || {};
                 },
                 roundName() {
                     const names = ['', 'Describe It', 'One Word', 'Charades'];
@@ -109,69 +159,142 @@
                         'Only gestures and sounds'
                     ];
                     return descriptions[this.currentRound];
+                },
+                availableCards() {
+                    return this.cards.filter((_, index) => !this.usedCards.includes(index));
+                },
+                roundComplete() {
+                    return this.availableCards.length === 0;
                 }
             },
             methods: {
-                async loadCards() {
-                    const cardSets = [
-                        // TV Characters
-                        'Jake Peralta (Brooklyn Nine-Nine)', 'Amy Santiago (Brooklyn Nine-Nine)', 'Charles Boyle (Brooklyn Nine-Nine)', 'Rosa Diaz (Brooklyn Nine-Nine)',
-                        'Jess Day (New Girl)', 'Nick Miller (New Girl)', 'Schmidt (New Girl)', 'Winston Bishop (New Girl)',
-                        'Rachel Green (Friends)', 'Monica Geller (Friends)', 'Phoebe Buffay (Friends)', 'Joey Tribbiani (Friends)', 'Chandler Bing (Friends)',
-                        'Michael Scott (The Office)', 'Jim Halpert (The Office)', 'Pam Beesly (The Office)', 'Dwight Schrute (The Office)',
-                        // Family & Friends
-                        'Steph', 'Charlie', 'Grisha', 'Hannah', 'Sampath', 'Sumyukta\'s Dad', 'Sumyukta\'s Mum',
-                        // Food Items
-                        'Gulab Jamun', 'Pad Kee Mao', 'Pistachio Ice Cream', 'Mochi', 'Iced Chai', 'Hot Chocolate',
-                        // Artists
-                        'Taylor Swift', 'Ed Sheeran', 'Sabrina Carpenter', 'Laufey',
-                        // Activities
-                        'Crocheting', 'Going for a picnic', 'Watching rom-coms', 'Playing tennis', 'Baking', 'Gardening',
-                        // Generic additions
-                        'Batman', 'Wonder Woman', 'Spider-Man', 'Pizza', 'Coffee', 'Dancing', 'Swimming'
+                loadCards() {
+                    const cardData = [
+                        {prompt: 'Rosa Diaz (Brooklyn 99) walking a dog', desc: 'Tough detective from Brooklyn 99 doing something unexpectedly gentle'},
+                        {prompt: 'Jake Peralta (Brooklyn 99) eating mochi at Yochi', desc: 'Childish detective enjoying Japanese dessert at frozen yogurt place'},
+                        {prompt: 'Amy Santiago (Brooklyn 99) doing pilates', desc: 'Organized detective doing stretching exercise'},
+                        {prompt: 'Jess Day (New Girl) crocheting a sweater', desc: 'Quirky teacher making clothing with yarn and hooks'},
+                        {prompt: 'Nick Miller (New Girl) playing tennis badly', desc: 'Grumpy bartender failing at racket sport'},
+                        {prompt: 'Schmidt (New Girl) assembling furniture', desc: 'Vain marketing guy building IKEA furniture'},
+                        {prompt: 'Rachel Green (Friends)', desc: 'Fashion-obsessed waitress from Central Perk'},
+                        {prompt: 'Monica Geller (Friends)', desc: 'Obsessively clean chef who lives across from Central Perk'},
+                        {prompt: 'Chandler Bing (Friends) getting lost in IKEA', desc: 'Sarcastic guy wandering through Swedish furniture maze'},
+                        {prompt: 'Michael Scott (The Office)', desc: 'Clueless boss who thinks he\'s hilarious'},
+                        {prompt: 'Jim Halpert (The Office)', desc: 'Prankster salesman who stares at camera'},
+                        {prompt: 'Dwight Schrute (The Office) singing karaoke', desc: 'Beet farmer performing songs on stage'},
+                        {prompt: 'Phil Dunphy (Modern Family)', desc: 'Dad who tries too hard to be cool'},
+                        {prompt: 'Gloria Pritchett (Modern Family)', desc: 'Colombian woman married to much older man'},
+                        {prompt: 'Moira Rose (Schitts Creek)', desc: 'Dramatic former soap opera actress with weird wigs'},
+                        {prompt: 'Barney Stinson (HIMYM)', desc: 'Suit-wearing guy who says "legendary"'},
+                        {prompt: 'Steph going for a picnic', desc: 'Best friend eating outdoors on blanket'},
+                        {prompt: 'Charlie watching a romance comedy', desc: 'Friend enjoying cheesy love movies'},
+                        {prompt: 'Grisha doing pilates', desc: 'Friend doing stretching exercises'},
+                        {prompt: 'Sampath playing tennis', desc: 'Boyfriend hitting ball with racket'},
+                        {prompt: 'Taylor Swift', desc: 'Pop star who writes songs about ex-boyfriends'},
+                        {prompt: 'Ed Sheeran', desc: 'Ginger singer-songwriter with guitar'},
+                        {prompt: 'Someone who talks to their plants', desc: 'Person having conversations with houseplants'},
+                        {prompt: 'A person who collects rubber ducks', desc: 'Someone with bathroom toy obsession'},
+                        {prompt: 'The person who always loses their keys', desc: 'Someone constantly searching pockets and bags'}
                     ];
                     
-                    // Shuffle and take 15 cards
-                    this.cards = cardSets.sort(() => Math.random() - 0.5).slice(0, 15);
+                    this.cards = cardData.sort(() => Math.random() - 0.5).slice(0, 20);
                 },
                 startGame() {
                     this.gameStarted = true;
                     this.currentRound = 1;
+                    this.usedCards = [];
                     this.currentCardIndex = 0;
-                    this.roundComplete = false;
-                    this.showCard = false;
-                    this.completedCards = [];
+                    this.currentTeam = 1;
+                    this.team1Score = 0;
+                    this.team2Score = 0;
+                    this.gameComplete = false;
+                    this.showDescription = false;
+                    this.getNextCard();
+                },
+                getNextCard() {
+                    const available = this.cards.map((_, i) => i).filter(i => !this.usedCards.includes(i));
+                    if (available.length > 0) {
+                        this.currentCardIndex = available[Math.floor(Math.random() * available.length)];
+                    }
+                },
+                startTurn() {
+                    this.turnActive = true;
+                    this.timeLeft = 60;
+                    this.timerRunning = true;
+                    this.showDescription = false;
+                    this.startTimer();
+                },
+                startTimer() {
+                    const timer = setInterval(() => {
+                        if (this.timeLeft > 0 && this.timerRunning) {
+                            this.timeLeft--;
+                        } else {
+                            clearInterval(timer);
+                            this.timerRunning = false;
+                            this.endTurn();
+                        }
+                    }, 1000);
                 },
                 gotIt() {
+                    if (this.currentTeam === 1) {
+                        this.team1Score++;
+                    } else {
+                        this.team2Score++;
+                    }
+                    
+                    this.usedCards.push(this.currentCardIndex);
+                    
                     confetti({
-                        particleCount: 100,
+                        particleCount: 50,
                         spread: 70,
                         origin: { y: 0.6 }
                     });
-                    this.completedCards.push(this.currentCardIndex);
-                    this.nextCard();
-                },
-                nextCard() {
-                    if (this.currentCardIndex < this.cards.length - 1) {
-                        this.currentCardIndex++;
-                        this.showCard = false;
+                    
+                    if (this.roundComplete) {
+                        this.timerRunning = false;
+                        this.endTurn();
                     } else {
-                        this.roundComplete = true;
+                        this.getNextCard();
+                        this.showDescription = false;
+                    }
+                },
+                skipCard() {
+                    if (this.roundComplete) {
+                        this.timerRunning = false;
+                        this.endTurn();
+                    } else {
+                        this.getNextCard();
+                        this.showDescription = false;
+                    }
+                },
+                endTurn() {
+                    this.turnActive = false;
+                    this.timerRunning = false;
+                    this.showDescription = false;
+                    
+                    if (!this.roundComplete) {
+                        this.currentTeam = this.currentTeam === 1 ? 2 : 1;
                     }
                 },
                 nextRound() {
                     this.currentRound++;
-                    this.currentCardIndex = 0;
-                    this.roundComplete = false;
-                    this.showCard = false;
+                    this.usedCards = [];
+                    this.currentTeam = 1;
+                    this.turnActive = false;
+                    this.getNextCard();
                 },
                 endGame() {
+                    this.gameComplete = true;
                     confetti({
                         particleCount: 200,
                         spread: 100,
                         origin: { y: 0.6 }
                     });
+                },
+                resetGame() {
                     this.gameStarted = false;
+                    this.gameComplete = false;
+                    this.loadCards();
                 }
             },
             mounted() {

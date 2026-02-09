@@ -16,10 +16,23 @@
             </div>
             <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-8 text-center">
                 <h2 class="text-3xl font-bold text-pink-600 mb-6">🎲 Random Scenarios</h2>
+                
                 <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Choose Category:</label>
+                    <select v-model="selectedCategory" @change="changeCategory" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500">
+                        <option v-for="(label, key) in categories" :key="key" :value="key">{{ label }}</option>
+                    </select>
+                </div>
+
+                <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <p class="text-sm text-gray-600 mb-2">{{ scenarios.length }} scenarios in this category</p>
                     <p class="text-lg text-gray-800 leading-relaxed">{{ currentScenario }}</p>
                 </div>
-                <button @click="nextScenario" class="bg-pink-500 text-white px-8 py-3 rounded-lg hover:bg-pink-600 text-lg">Next Scenario →</button>
+
+                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                    <button @click="nextScenario" class="bg-pink-500 text-white px-6 py-3 rounded-lg hover:bg-pink-600 text-lg">Next Scenario →</button>
+                    <button @click="randomScenario" class="bg-purple-500 text-white px-6 py-3 rounded-lg hover:bg-purple-600 text-lg">🎲 Random</button>
+                </div>
             </div>
         </div>
     </div>
@@ -50,8 +63,19 @@
         createApp({
             data() {
                 return {
+                    allScenarios: [],
                     scenarios: [],
-                    currentScenarioIndex: 0
+                    currentScenarioIndex: 0,
+                    selectedCategory: 'all',
+                    categories: {
+                        all: 'All Scenarios',
+                        personal: 'Personal Dilemmas',
+                        tvshows: 'TV Show Characters',
+                        celebrities: 'Celebrity Encounters',
+                        family: 'Family & Friends',
+                        relationships: 'Relationship Situations',
+                        awkward: 'Awkward Moments'
+                    }
                 }
             },
             computed: {
@@ -62,17 +86,65 @@
             methods: {
                 async loadScenarios() {
                     try {
-                        const response = await fetch('data/scenarios.txt');
+                        const response = await fetch(`data/scenarios.txt?v=${Date.now()}`);
                         const text = await response.text();
-                        this.scenarios = text.split('\n').filter(line => line.trim());
-                        // Start with random scenario
-                        this.currentScenarioIndex = Math.floor(Math.random() * this.scenarios.length);
+                        this.allScenarios = text.split('\n').filter(line => line.trim().length > 0);
+                        console.log('Loaded scenarios:', this.allScenarios.length);
+                        console.log('First scenario:', this.allScenarios[0]);
+                        console.log('Last scenario:', this.allScenarios[this.allScenarios.length - 1]);
+                        this.filterScenarios();
                     } catch (error) {
                         console.error('Error loading scenarios:', error);
                     }
                 },
+                categorizeScenario(scenario) {
+                    const lower = scenario.toLowerCase();
+                    if (lower.includes('taylor swift') || lower.includes('ed sheeran') || lower.includes('sabrina carpenter') || lower.includes('laufey') || lower.includes('shawn mendes') || lower.includes('olivia rodrigo') || lower.includes('vance joy')) {
+                        return 'celebrities';
+                    }
+                    if (lower.includes('jake peralta') || lower.includes('amy santiago') || lower.includes('rosa diaz') || lower.includes('jess day') || lower.includes('nick miller') || lower.includes('schmidt') || lower.includes('rachel green') || lower.includes('monica geller') || lower.includes('chandler bing') || lower.includes('michael scott') || lower.includes('jim halpert') || lower.includes('dwight schrute') || lower.includes('phil dunphy') || lower.includes('gloria pritchett') || lower.includes('moira rose') || lower.includes('david rose') || lower.includes('barney stinson') || lower.includes('ted mosby')) {
+                        return 'tvshows';
+                    }
+                    if (lower.includes('sampath') && (lower.includes('married') || lower.includes('relationship') || lower.includes('romantic') || lower.includes('date'))) {
+                        return 'relationships';
+                    }
+                    if (lower.includes('steph') || lower.includes('charlie') || lower.includes('grisha') || lower.includes('hannah') || lower.includes('sumyukta\'s dad') || lower.includes('sumyukta\'s mum') || lower.includes('karthik') || lower.includes('leela') || lower.includes('arjun')) {
+                        return 'family';
+                    }
+                    if (lower.includes('accidentally') || lower.includes('embarrassing') || lower.includes('awkward') || lower.includes('mortifying')) {
+                        return 'awkward';
+                    }
+                    return 'personal';
+                },
+                filterScenarios() {
+                    if (this.selectedCategory === 'all') {
+                        this.scenarios = [...this.allScenarios];
+                    } else {
+                        this.scenarios = this.allScenarios.filter(scenario => 
+                            this.categorizeScenario(scenario) === this.selectedCategory
+                        );
+                    }
+                    console.log('Filtered scenarios:', this.scenarios.length, 'for category:', this.selectedCategory);
+                    this.shuffleScenarios();
+                    this.currentScenarioIndex = 0;
+                },
+                shuffleScenarios() {
+                    for (let i = this.scenarios.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [this.scenarios[i], this.scenarios[j]] = [this.scenarios[j], this.scenarios[i]];
+                    }
+                },
                 nextScenario() {
                     this.currentScenarioIndex = (this.currentScenarioIndex + 1) % this.scenarios.length;
+                    if (this.currentScenarioIndex === 0) {
+                        this.shuffleScenarios();
+                    }
+                },
+                randomScenario() {
+                    this.currentScenarioIndex = Math.floor(Math.random() * this.scenarios.length);
+                },
+                changeCategory() {
+                    this.filterScenarios();
                 }
             },
             mounted() {

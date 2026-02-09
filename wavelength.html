@@ -37,12 +37,18 @@
 
                 <div class="text-center space-y-4">
                     <div v-if="!gameStarted" class="space-y-4">
-                        <button @click="startRound" class="bg-pink-500 text-white px-8 py-3 rounded-lg hover:bg-pink-600 text-lg font-bold">Start Round</button>
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                            <button @click="startRound" class="bg-pink-500 text-white px-8 py-3 rounded-lg hover:bg-pink-600 text-lg font-bold">Start Round</button>
+                            <button @click="skipTopic" class="bg-gray-400 text-white px-6 py-3 rounded-lg hover:bg-gray-500">Skip Topic</button>
+                        </div>
                     </div>
                     
                     <div v-if="gameStarted && !guessingPhase" class="space-y-4">
                         <p class="text-gray-700">Psychic: Look at the green target zone and give your clue!</p>
-                        <button @click="startGuessing" class="bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 text-lg font-bold">Start Guessing</button>
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                            <button @click="startGuessing" class="bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 text-lg font-bold">Start Guessing</button>
+                            <button @click="skipTopic" class="bg-gray-400 text-white px-6 py-3 rounded-lg hover:bg-gray-500">Skip Topic</button>
+                        </div>
                     </div>
                     
                     <div v-if="guessingPhase && !showFinalTarget" class="space-y-4">
@@ -51,12 +57,18 @@
                             <input type="range" min="0" max="85" v-model="guessPosition" 
                                    class="w-full max-w-md mx-auto block">
                         </div>
-                        <button @click="lockInGuess" class="bg-green-500 text-white px-8 py-3 rounded-lg hover:bg-green-600 text-lg font-bold">Lock In Guess</button>
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                            <button @click="lockInGuess" class="bg-green-500 text-white px-8 py-3 rounded-lg hover:bg-green-600 text-lg font-bold">Lock In Guess</button>
+                            <button @click="skipTopic" class="bg-gray-400 text-white px-6 py-3 rounded-lg hover:bg-gray-500">Skip Topic</button>
+                        </div>
                     </div>
                     
                     <div v-if="showFinalTarget" class="space-y-4">
                         <div class="text-lg font-bold" :class="scoreClass">{{ scoreText }}</div>
-                        <button @click="nextRound" class="bg-pink-500 text-white px-8 py-3 rounded-lg hover:bg-pink-600 text-lg">Next Round →</button>
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                            <button @click="nextRound" class="bg-pink-500 text-white px-8 py-3 rounded-lg hover:bg-pink-600 text-lg">Next Round →</button>
+                            <button @click="skipTopic" class="bg-gray-400 text-white px-6 py-3 rounded-lg hover:bg-gray-500">Skip Topic</button>
+                        </div>
                     </div>
                 </div>
 
@@ -168,6 +180,14 @@
                 },
                 startGuessing() {
                     this.guessingPhase = true;
+                },
+                skipTopic() {
+                    this.currentSpectrumIndex = (this.currentSpectrumIndex + 1) % this.spectrums.length;
+                    this.targetPosition = Math.random() * 85;
+                    this.guessPosition = 42.5;
+                    this.gameStarted = false;
+                    this.guessingPhase = false;
+                    this.showFinalTarget = false;
                 },
                 lockInGuess() {
                     this.showFinalTarget = true;
